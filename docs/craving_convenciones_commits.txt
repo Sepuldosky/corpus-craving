@@ -1,0 +1,153 @@
+CRAVING — CONVENCIONES DE GIT COMMITS (repo: corpus-craving/, el módulo de supervivencia)
+Guía de estandarización para el historial de cambios de este repositorio
+=====================================================
+Documento vivo — actualizaciones según evolución del flujo.
+Basado en las convenciones de KONTROL, portadas vía ADS 2.0 y Corpus, adaptado al
+stack GLua / Garry's Mod y al alcance de Craving como módulo de hambre/hidratación.
+
+Este doc cubre SOLO el repo corpus-craving/. La estructura (secciones 0, 1, 2, 4, 5)
+es idéntica a corpus/docs/corpus_convenciones_commits.txt; solo la sección 3
+(alcances) cambia porque depende del mapa de archivos de este repo.
+=====================================================
+
+
+0. PROPÓSITO Y AUDIENCIA
+--------------------------
+
+Este documento establece las reglas y la estructura obligatoria para la redacción de
+mensajes de commit en el repositorio de CRAVING (módulo). Su objetivo es mantener
+un historial limpio, legible y automatizable.
+
+Aplica de forma estricta a todo commit confirmado en este repositorio,
+independientemente de quién o qué lo origine.
+
+
+1. ESTRUCTURA OBLIGATORIA DEL MENSAJE
+---------------------------------------
+
+Todo commit DEBE seguir el estándar de Conventional Commits adaptado al proyecto:
+
+  <tipo>(<alcance>): <descripción corta>
+
+Los tipos van en inglés (ver sección 2). La descripción y el cuerpo opcional del
+commit van en español.
+
+Reglas críticas de formato:
+- NUNCA empezar la descripción con mayúscula.
+- NUNCA incluir un punto (.) al final de la descripción.
+- Usar el tiempo presente imperativo (ej: "añade" en lugar de "añadido",
+  "aplica" en lugar de "aplicando").
+
+
+2. TIPOS DE COMMIT PERMITIDOS (<tipo>)
+----------------------------------------
+
+Se prohíben términos genéricos como "cambios", "fix" a secas o "tarea". Los tipos
+válidos son:
+
+  feat:
+    Una nueva funcionalidad para el módulo (nuevo subsistema, nueva mecánica de
+    dominio, nueva superficie pública consumible por otros módulos).
+
+  fix:
+    Corrección de un error o bug activo en el código Lua o en el esquema de datos
+    persistidos.
+
+  refactor:
+    Modificaciones en el código Lua que no añaden funcionalidades ni corrigen
+    errores.
+
+  docs:
+    Cambios exclusivos en archivos de documentación (.txt, .md, CLAUDE.md). No debe
+    tocar código.
+
+  chore:
+    Tareas de mantenimiento rutinario que no afectan la lógica del módulo ni la
+    documentación (ej: .gitignore, estructura de carpetas, assets, addon.json).
+
+  test:
+    Añadir, modificar o corregir bloques de auto-test o comandos de validación en
+    consola.
+
+
+3. ALCANCES ESPECÍFICOS DE CRAVING (<alcance>)
+------------------------------------------------
+
+El alcance identifica el subsistema o área afectada. Debe ir siempre entre paréntesis.
+Para corpus-craving/ (el módulo), los alcances definidos son:
+
+  config:
+    Convars, tablas de balance, la tabla de consumibles y las funciones puras
+    (corpus_craving_config.lua).
+
+  assets:
+    Resolución de modelos/sonidos por candidatos y los sets del addon
+    Corpus S.T.A.L.K.E.R. (corpus_craving_assets.lua).
+
+  core:
+    Estado por jugador, tick de decay, umbrales, daño del fallback, persistencia
+    y espejo NW2 (corpus_craving_core.lua).
+
+  coagulant:
+    El puente mock-first de condiciones clínicas hacia Coagulant
+    (corpus_craving_coagulant.lua).
+
+  items:
+    Consumibles contra el framework de Cargo (shared/corpus_craving_items.lua —
+    ambos realms, ver CLAUDE.md).
+
+  entity:
+    La comida en mundo y sus entradas del spawnmenu
+    (lua/entities/corpus_craving_food.lua).
+
+  bars:
+    Las barras del StatusPanel de Cargo (corpus_craving_bars.lua).
+
+  options:
+    El tab del menú Q y toda UI cliente del módulo
+    (corpus_craving_options.lua).
+
+  dev:
+    Auto-test y comandos de validación en consola (corpus_craving_dev.lua).
+
+  init:
+    El manifest de carga y el bloque de contrato público
+    (corpus_craving_init.lua).
+
+  docs:
+    Cambios a la arquitectura, estado, roadmap o convenciones cuando el commit es
+    puramente documental y no encaja en ninguno de los alcances de arriba.
+
+
+4. EJEMPLOS PRÁCTICOS DE APLICACIÓN
+-------------------------------------
+
+  4.1 Código:
+    - feat(core): añade el tick de decay con modificadores de sprint y sobrepeso
+    - fix(assets): corrige la ruta del modelo de vodka del pack ZONA
+    - feat(items): registra los seis consumibles contra el framework de Cargo
+
+  4.2 Estructura y docs:
+    - chore(init): añade el manifest de carga corpus_craving_init.lua
+    - docs(docs): registra la bajada del Block 4 como primera sesión del CHANGELOG
+    - test(dev): añade round-trip de Consume al craving_selftest
+
+
+5. AUTOMATIZACIÓN EN VSCODE
+-----------------------------
+
+Para garantizar que el flujo sea ágil y no requiera construcción manual en cada
+commit, se recomienda el uso de herramientas integradas en VSCode:
+
+  Extensión Conventional Commits:
+    Instalar la extensión "Conventional Commits" de Vivian De Smedt. Ofrece un menú
+    desplegable interactivo en la barra de Git para estructurar el tipo, alcance y
+    descripción de forma automática.
+
+=====================================================
+Documentos complementarios:
+  docs/craving_estado.md                    → foto de HOY del módulo
+  docs/craving_roadmap.txt                  → rumbo / qué sigue
+  CLAUDE.md                                 → guía operativa para asistencia con Claude Code
+  ../corpus/docs/corpus_flujo_trabajo.txt   → metodología compartida del ecosistema
+=====================================================

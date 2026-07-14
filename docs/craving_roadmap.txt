@@ -1,0 +1,65 @@
+CRAVING — ROADMAP (BRÚJULA)
+Hacia dónde va el módulo y en qué orden. Qué construir next.
+=====================================================
+Documento vivo. Fija el RUMBO (secuencia estable de lo que sigue).
+"Dónde estamos dentro de esto" lo dice docs/craving_estado.md (foto de HOY).
+Leer JUNTO con craving_estado.md al decidir el próximo bloque.
+=====================================================
+
+
+0. CÓMO SE USA
+----------------
+
+Este doc ORDENA lo que sigue; craving_estado.md dice en qué punto estamos. El
+detalle de diseño vive en Craving_Architecture.md (doc particular) — acá NO se
+duplica; solo el orden y el criterio de entrada de cada tramo. Metodología:
+corpus/docs/corpus_flujo_trabajo.txt (canónica del ecosistema).
+
+
+1. INMEDIATO
+--------------
+
+  [1] HECHO (2026-07-14). Verificación en juego del v1 en tres rondas: los 12
+      entries del CHANGELOG quedaron [APLICADO]. Los puntos calientes se
+      resolvieron todos — KeyValues del spawnmenu funcionan; las rutas CS:S
+      nunca hicieron falta (el pack STALKER cubre); los sonidos se
+      re-seleccionaron (entry 11). Queda opcional la pata sin-Cargo del
+      checklist, diferida por el autor.
+
+  [2] Primer commit + push del repo cuando el autor lo pida. **Es lo próximo**:
+      el v1 está verificado y el repo GitHub sigue vacío.
+
+  [3] Negociar `ApplyExternalCondition` con Coagulant cuando su Block 3 baje a
+      código (hoy el puente es mock-first, arquitectura §4; Coagulant §12 ya
+      lista a Craving como consumidor — falta la vía de condición externa).
+
+
+2. SIGUIENTE — bloques futuros (orden por afinidad, arquitectura §14)
+----------------------------------------------------------------------
+
+  [4] Cocinar (crudo → cocido): carne de mutante ZONA, fogata o Workbench de
+      Cargo. Arrastra comida cruda/agua de río → enfermedad (misma vía §4) y
+      caza/harvest. Criterio de entrada: v1 verificado + Coagulant Block 3 en
+      juego.
+
+  [5] Efectos de consumibles: vodka/drunk (screen effects), buffs estilo GAMMA.
+      Criterio de entrada: sistema de efectos temporales diseñado (bloque
+      propio, corto).
+
+  [6] Agua avanzada: cantimplora rellenable (ítem único con blob de Cargo),
+      beber del mundo (D3), props del mapa comestibles (D2).
+
+  [7] Consumir eventos de Coagulant (sangrado ↑ sed) — azúcar, cuando [3] cierre.
+
+Descartados salvo pedido explícito: spoilage (rompe el modelo stackeable de
+Cargo), farming (fuera del espíritu del ecosistema). Fronteras duras: stamina/
+sueño = Coagulant; radiación sin dueño; NPCs = Cortex.
+
+
+=====================================================
+Documentos complementarios:
+  docs/craving_estado.md             → foto de HOY (dónde estamos)
+  docs/Craving_Architecture.md       → diseño ratificado (Block 4)
+  docs/Craving_Block4_Semilla.md     → registro histórico de decisiones A-F
+  ../corpus/docs/corpus_flujo_trabajo.txt → cómo ejecutar cada tramo
+=====================================================

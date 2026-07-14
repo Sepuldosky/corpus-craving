@@ -1,0 +1,82 @@
+# CLAUDE.md
+
+Guía para trabajar en **Craving** — el módulo de supervivencia de jugador del ecosistema Corpus (addon GLua para Garry's Mod). Léela antes de tocar código o docs de este repo.
+
+## Qué es
+
+Craving es el módulo de **hambre e hidratación de jugador** del ecosistema Corpus. Es un addon Gmod independiente con su propio git, que **hard-depende** de Corpus (la única dependencia dura del ecosistema) y de nadie más. Detecta a otros módulos en runtime vía `Corpus.GetModule`/`Corpus.HasModule`, nunca los asume: **Cargo** (consumibles + barras + sobrepeso) y **Coagulant** (efectos clínicos de la inanición) son soft-deps con degradación honesta — sin Cargo, comida por entity de mundo y feedback indirecto; sin Coagulant (o con uno incapaz), daño periódico al HP nativo hasta la muerte. Ver §2, §4-§5 de `../corpus/docs/CORPUS_Architecture.md`.
+
+**Estado actual: BLOCK 4 (medio-bloque Craving) CERRADO — v1 VERIFICADO EN JUEGO** (rondas 2-4, 2026-07-13/14: los 12 entries del CHANGELOG en `[APLICADO]`; solo queda opcional la pata sin-Cargo del checklist, ver [`docs/craving_estado.md`](docs/craving_estado.md)). El diseño está cerrado y ratificado (2026-07-13) en [`docs/Craving_Architecture.md`](docs/Craving_Architecture.md) — doc particular autocontenido; la semilla con el registro de decisiones vive en [`docs/Craving_Block4_Semilla.md`](docs/Craving_Block4_Semilla.md). Los números de balance son tunables en `corpus_craving_config.lua`; la lógica no se toca para balancear.
+
+**Regla cardinal:** nada de lógica de dominio sube a Corpus, y la lógica ajena no baja acá: el contenedor/grid/peso es de Cargo, la stamina/vitales/heridas son de Coagulant (Cargo ya lo declaró dueño de la stamina), la radiación no tiene dueño todavía. Craving posee solo el hambre y la sed (cuánto drena, qué restaura cada comida).
+
+## Docs del proyecto — jerarquía de lectura
+
+Antes de tocar código o diseño, lee en este orden (los tres primeros son **docs vivos**):
+
+1. **Estado de HOY** → [`docs/craving_estado.md`](docs/craving_estado.md). Foto del AHORA, ≤1 pantalla. **Léelo ANTES** que la arquitectura.
+2. **Rumbo** → [`docs/craving_roadmap.txt`](docs/craving_roadmap.txt). Qué sigue y en qué orden.
+3. **Historial de parches** → [`docs/CHANGELOG.md`](docs/CHANGELOG.md). `[PENDIENTE]`/`[APLICADO YYYY-MM-DD]`, nunca se borra ni renumera.
+4. **Metodología de trabajo** → [`../corpus/docs/corpus_flujo_trabajo.txt`](../corpus/docs/corpus_flujo_trabajo.txt). **Doc canónico compartido** por todo el ecosistema — no se duplica acá.
+5. **Arquitectura del módulo** → [`docs/Craving_Architecture.md`](docs/Craving_Architecture.md) (Block 4: hambre/hidratación v1, ratificado). La frontera general sigue en `../corpus/docs/CORPUS_Architecture.md` §2, §4-§5.
+6. **Convenciones de commit** → [`docs/craving_convenciones_commits.txt`](docs/craving_convenciones_commits.txt). Alcances específicos de **este** repo.
+
+## Idioma
+
+- **Código (comentarios): español** (estilo corpus/caliber/coagulant; Cargo es la excepción en inglés). Iguala el del archivo que edites.
+- **Strings de cara al jugador (UI, nombres de ítems, hints): inglés** — es el idioma del mod (decisión del autor, fijada en Cargo el 2026-07-10).
+- **Docs, commits y logs (`Corpus.Log`): español**; los `<tipo>` de commit en inglés (ver convenciones).
+
+## El workspace multi-repo
+
+Este repo (`corpus-craving/`) es una de seis raíces del workspace `corpus.code-workspace`. La raíz `corpus/` es el framework del que todos hard-dependen; las otras cuatro (`corpus-cortex/`, `corpus-caliber/`, `corpus-coagulant/`, `corpus-cargo/`) son módulos hermanos que se detectan en runtime, nunca se asumen. Al diseñar integración con mods ajenos, consulta `../dev/mods_workshop_mapa.md` (RECICLAR vs. COMPAT-RUNTIME).
+
+**Assets STALKER:** los modelos/sonidos ZONA que este módulo referencia viven en el addon de contenido **Corpus S.T.A.L.K.E.R.** ([`../corpus-stalker/`](../corpus-stalker/), séptima raíz del workspace, montado por junction en `addons/`). Sus assets son ports de GSC y **no se versionan** (gitignore propio; la MIT cubre el código, no los assets). Este repo jamás los incluye: solo rutas con fallback a HL2/CS:S vía `CRAVING.Assets` (§6 de la arquitectura). *Ojo: hasta el 2026-07-13 ese addon vivía en `dev/corpus_stalker/` — los docs viejos que nombren esa ruta están desactualizados.*
+
+## Mapa de archivos
+
+Un **manifest de carga explícito** (`corpus_craving_init.lua`, único archivo en `lua/autorun/`) registra el módulo, declara el contrato público y hace `include()` en orden determinista — patrón template tomado de Caliber (boot diferido a `Initialize`, sonda `CorpusListo`, falla ruidoso sin framework). Los sub-archivos viven en `lua/corpus_craving/<realm>/`, **fuera** de `lua/autorun/`. La entity va en `lua/entities/` (la carga el sistema de scripted_ents, no el manifest) y resuelve el módulo en runtime, nunca en file-scope.
+
+| Archivo | Realm | Rol |
+|---|---|---|
+| [`lua/autorun/corpus_craving_init.lua`](lua/autorun/corpus_craving_init.lua) | shared | Entry + registro (`craving`) + **bloque CONTRATO** + manifest |
+| [`lua/corpus_craving/shared/corpus_craving_config.lua`](lua/corpus_craving/shared/corpus_craving_config.lua) | shared | Convars + balance tunable + tabla de consumibles (§5) + funciones puras + getters client (NW2) |
+| [`lua/corpus_craving/shared/corpus_craving_assets.lua`](lua/corpus_craving/shared/corpus_craving_assets.lua) | shared | Resolución de modelo/sonido por lista de candidatos (§6): ZONA → CS:S → HL2 garantizado |
+| [`lua/corpus_craving/shared/corpus_craving_dev.lua`](lua/corpus_craving/shared/corpus_craving_dev.lua) | shared | `craving_selftest` + `craving_status` + `craving_set` (admin) |
+| [`lua/corpus_craving/server/corpus_craving_coagulant.lua`](lua/corpus_craving/server/corpus_craving_coagulant.lua) | server | **Puente mock-first** a Coagulant (§4): `ApplyExternalCondition` esperado, degradación por capacidad (`isfunction`), severity on-change |
+| [`lua/corpus_craving/server/corpus_craving_core.lua`](lua/corpus_craving/server/corpus_craving_core.lua) | server | Estado por jugador, tick de 5 s (decay + sprint + sobrepeso), umbrales/hints/evento, daño fallback, respawn 75/75, persistencia, espejo NW2 |
+| [`lua/corpus_craving/shared/corpus_craving_items.lua`](lua/corpus_craving/shared/corpus_craving_items.lua) | shared | 6 consumibles contra Cargo (`Corpus.OnReady`, categoría `food`) — **shared a propósito**: el snapshot de Cargo solo trae defs autogen; las defs de módulo se registran en ambos realms (lección de la primera pasada en juego) |
+| [`lua/entities/corpus_craving_food.lua`](lua/entities/corpus_craving_food.lua) | shared | Comida en mundo (§7): WALK+E → al inventario (con Cargo) o consumo in situ (sin Cargo); E pelado = carry de prop + entradas del spawnmenu |
+| [`lua/corpus_craving/client/corpus_craving_bars.lua`](lua/corpus_craving/client/corpus_craving_bars.lua) | client | Barras Hunger/Hydration en el StatusPanel de Cargo (soft-dep) |
+| [`lua/corpus_craving/client/corpus_craving_options.lua`](lua/corpus_craving/client/corpus_craving_options.lua) | client | Tab único `Corpus.UI.RegisterTab("craving", …)` + toggle de hints |
+
+## Contratos que no debes romper
+
+1. **Namespace: tabla única registrada.** Cada archivo abre con `local CRAVING = Corpus.GetModule("craving")` (el init la registró antes). Ningún archivo declara globals sueltos. Depende del invariante by-ref del registro de Corpus.
+2. **Detección, nunca asunción.** El hard-dep (Corpus) se detecta en el init (falla ruidoso si falta). Cargo y Coagulant se consultan con lazy-check en el momento del uso, o en `Corpus.OnReady` para wiring de una vez — jamás en file-scope, jamás asumidos.
+3. **Degradación por CAPACIDAD, no por presencia.** El puente Coagulant exige `isfunction(coag.ApplyExternalCondition)` — un Coagulant montado sin la función cae al mismo fallback que su ausencia (daño HP propio). Mientras la delegación está activa, Craving **no toca HP**: un solo dueño de la muerte a la vez.
+4. **Contrato público mínimo congelado.** Solo `CRAVING.GetHunger/GetHydration(ply)`, `CRAVING.Restore(ply, hunger, hyd)` y el evento `Craving_StatCritical(ply, stat, isCritical)` son superficie pública (§8 de la arquitectura). El resto es off-contract por convención, documentado en el bloque CONTRATO del init.
+5. **La semántica del consumo es de Craving; el contenedor es de Cargo.** `onUse` corre acá; Cargo solo consume 1 unidad si devuelve `true` (el anti-desperdicio de §5 depende de eso: barra llena → `false`). Nunca metas grid/peso/persistencia de inventario en este repo.
+6. **Los assets GSC no entran a este repo.** Todo modelo/sonido STALKER se referencia por ruta vía `CRAVING.Assets` con fallback HL2/CS:S; el último candidato de cada lista es SIEMPRE HL2 vanilla. Los `.mdl` ZONA no se re-namespacean (referencian materiales por ruta compilada).
+7. **Balance = data.** Los números viven en `corpus_craving_config.lua` (y convars); balancear jamás toca `core`/`coagulant`/`items`.
+8. **Un solo timer.** Todo el decay/umbral/daño pasa por el tick de 5 s de `core` — nada per-frame, nada de timers por jugador.
+9. **Prefijo de archivo por módulo:** `corpus_craving_*.lua` en todo lo que cargue el engine.
+
+## Verificación
+
+No hay test runner de GMod — el patrón es cargar mapa y confirmar (flujo §1 PASO 4), **la corre el autor**. Capas previas:
+
+1. **`craving_selftest`** (consola, realm que lo invoca): config pura (drenaje, sobrepeso, severity), tabla de ítems, resolución de assets, contrato público, round-trip de estado/Consume si hay jugador, reporte de soft-deps. En listen server, realm server: `lua_run Corpus.GetModule("craving")._SelfTest()`.
+2. **Harness offline** (LuaJIT vía `lupa` + stubs de GMod, carga el framework real de `corpus/`): mismo patrón que verificó Corpus, Cargo y Coagulant; el script se reconstruye en el scratchpad de sesión.
+
+Flujo en juego: cargar mapa con corpus/ + craving/ (y opcionalmente cargo/, coagulant/, corpus_stalker) → `craving_selftest` → `craving_set 30 20` y ver hints/estómago → con Cargo: barras en el panel, `Bread` en categoría `food`, comer desde quick slot restaura y suena, con barra llena NO consume → entity `Bread` (Entities → Corpus) con **WALK+E** (E pelado = carry de prop, entry 12) → `craving_set 0 0` sin Coagulant: daño periódico y mensaje de muerte → reconectar restaura stats → tab en Q → Utilities → Corpus → Craving.
+
+Al cerrar un cambio con superficie de runtime: refresca [`docs/craving_estado.md`](docs/craving_estado.md) en sitio y actualiza [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (`[PENDIENTE]` → `[APLICADO YYYY-MM-DD]`, sin borrar ni renumerar).
+
+## Git / commits
+
+Sigue [`docs/craving_convenciones_commits.txt`](docs/craving_convenciones_commits.txt): `<tipo>(<alcance>): <descripción>` — tipo en inglés, descripción en español, minúscula inicial, sin punto final, imperativo. Alcances de este repo: `config`, `assets`, `core`, `coagulant`, `items`, `entity`, `bars`, `options`, `dev`, `init` (+ `docs`, `chore`).
+
+**Este repo está publicado en GitHub** (`github.com/Sepuldosky/corpus-craving`, público, remote `origin` cableado localmente). No hagas commit ni push salvo que se pida explícitamente.
+
+**No agregues el trailer `Co-Authored-By: Claude` (ni ninguna atribución de co-autoría a Claude/Anthropic) en los mensajes de commit.** Esto sobreescribe el comportamiento por defecto del harness.
