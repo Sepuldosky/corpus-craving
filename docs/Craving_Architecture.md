@@ -27,8 +27,8 @@ Soft-deps, siempre lazy-check / `Corpus.OnReady`, jamás asumidas:
 | Peer | Consume | Sin él, degrada a |
 |---|---|---|
 | **Cargo** (en código, verificado) | `Items.Register` (consumibles §5), `StatusPanel.RegisterBar` (barras §10), `Inventory.GetWeightFraction` (decay por sobrepeso §2) | comida solo por entities de mundo (§7); sin barras (feedback indirecto §10); sin modificador de sobrepeso |
-| **Coagulant** (Block 3 en borrador — mock-first) | contrato esperado `ApplyExternalCondition` (§4) | daño periódico al HP nativo hasta la muerte (§3) |
-| **Corpus S.T.A.L.K.E.R.** (addon de assets en `dev/`, opcional, no publicable) | modelos y sonidos ZONA (§6) | modelos HL2/CS:S conocidos + sonidos base del engine |
+| **Coagulant** (Block 3 **en código** — slices 1-3 verificados en juego, UI pendiente; puente mock-first: todavía **no expone condición externa**) | contrato esperado `ApplyExternalCondition` (§4) | daño periódico al HP nativo hasta la muerte (§3) |
+| **Corpus S.T.A.L.K.E.R.** (addon de contenido, **séptima raíz del workspace** `../corpus-stalker/`, opcional; **sus assets GSC no se versionan** — el addon sí) | modelos y sonidos ZONA (§6) | modelos HL2/CS:S conocidos + sonidos base del engine |
 
 Dirección única: Craving detecta a sus peers; nadie detecta a Craving. Fuera de
 la frontera (no-scope duro, §14): stamina/fatiga/sueño (Coagulant), radiación
@@ -70,7 +70,7 @@ por dirección, no por tick):
 
 | Umbral | Feedback | Efecto mecánico |
 |---|---|---|
-| **≤ 50** — "hungry / thirsty" | hint centrado (`You feel hungry.` / `You feel thirsty.`) + sonido de inventario suave | ninguno (aviso temprano) |
+| **≤ 50** — "hungry / thirsty" | hint centrado (`You feel hungry.` / `You feel thirsty.`) — sin audio | ninguno (aviso temprano) |
 | **≤ 25** — severo | estómago rugiendo (`hunger.mp3`) emitido **desde el jugador** cada 60-90 s aleatorio — audible por jugadores cercanos (flavor/stealth, §4 de la semilla, convar off) · hint más duro | arranca la `severity` que se reporta a Coagulant (§4) |
 | **= 0** — crítico | hint persistente | **con Coagulant**: delegación total (§4), Craving no toca HP. **Sin Coagulant**: daño periódico al HP nativo — hambre 1 HP / 10 s, sed 1 HP / 5 s (se suman si ambos están en 0), × `craving_damage_scale` |
 
@@ -89,8 +89,8 @@ por dirección, no por tick):
 Coagulant es el dueño clínico del jugador; cuando está, la inanición se vuelve
 un **estado clínico**, no un chip de HP. Contrato **esperado** (patrón mock-first,
 flujo §3 — congelado acá, **pendiente de negociar** con el Block 3 de Coagulant,
-cuyo borrador actual expone tratamiento/getters/eventos pero todavía ninguna vía
-de condición externa):
+cuyo **código actual** (slices 1-3 verificados en juego) expone
+tratamiento/getters/eventos pero **todavía ninguna vía de condición externa**):
 
 ```lua
 -- Firma esperada (a ratificar en Coagulant_Architecture.md §8):
@@ -112,9 +112,9 @@ Reglas del puente (server, `corpus_craving_coagulant.lua`):
    no cada tick — sin spam.
 3. Mientras la delegación está activa, Craving **no aplica daño de HP** — un solo
    dueño de la muerte a la vez.
-4. Dirección única confirmada por el borrador de Coagulant (§12: "Coagulant no
-   detecta a Craving"). Consumir los eventos `Coagulant_*` (p.ej. sangrado ↑ sed)
-   queda como bloque futuro (§14).
+4. Dirección única confirmada por Coagulant (§12: "Coagulant **no** detecta a
+   Craving"). Consumir los eventos `Coagulant_*` (p.ej. sangrado ↑ sed) queda
+   como bloque futuro (§14).
 
 ---
 
@@ -137,8 +137,8 @@ contra el schema real de Cargo (`corpus_cargo_items.lua`, verificado):
 | `corpus_craving_bread` | Bread | +30 | 0 | 0.30 | `models/stalker/item/food/bread.mdl` |
 | `corpus_craving_sausage` | Sausage | +50 | 0 | 0.45 | `.../food/sausage.mdl` |
 | `corpus_craving_tuna` | Canned tuna | +35 | +5 | 0.25 | `.../food/tuna.mdl` |
-| `corpus_craving_water` | Water bottle | 0 | +60 | 0.60 | `.../food/drink.mdl` |
-| `corpus_craving_softdrink` | Soft drink | +5 | +30 | 0.33 | `.../food/drink.mdl` (skin/mismo modelo) |
+| `corpus_craving_water` | Water bottle | 0 | +60 | 0.60 | — *(el `drink.mdl` ZONA es una **bebida energética**, no una botella: se reserva para el Soft drink)* |
+| `corpus_craving_softdrink` | Soft drink | +5 | +30 | 0.33 | `.../food/drink.mdl` *(único ítem que usa ese modelo)* |
 | `corpus_craving_vodka` | Vodka | 0 | +5 | 0.50 | `.../food/vokda.mdl` *(el typo es del pack)* |
 
 - **Consumo instantáneo** en el `onUse`: aplicar restore (clamp a 100), emitir
@@ -190,7 +190,7 @@ contenido nativo de GMod hoy, decisión del autor):
 | Bread | `models/props/cs_italy/bread_slice.mdl` (validar) | `models/props_junk/garbage_takeoutcarton001a.mdl` |
 | Sausage | `models/props/cs_italy/it_mkt_sausage.mdl` (validar) | `models/props_junk/garbage_takeoutcarton001a.mdl` |
 | Canned tuna | — | `models/props_junk/garbage_metalcan001a.mdl` |
-| Water bottle | — | `models/props_junk/glassbottle01a.mdl` |
+| Water bottle | `models/props_junk/garbage_plasticbottle003a.mdl` (botella plástica HL2) | `models/props_junk/glassbottle01a.mdl` |
 | Soft drink | — | `models/props_junk/PopCan01a.mdl` |
 | Vodka | — | `models/props_junk/glassbottle01a.mdl` |
 
@@ -198,9 +198,16 @@ Sonidos (rutas ZONA verbatim del pack actionsounds):
 
 | Uso | ZONA | Fallback engine (validar) |
 |---|---|---|
-| Comer (`onUse` comida) | `zona/stalkerrp/actions/eat<1-5>.mp3` (aleatorio) | `npc/barnacle/barnacle_gulp1.wav` |
-| Beber (`onUse` bebida) | `zona/stalkerrp/actions/interface/inv_softdrink.ogg` / `inv_vodka.ogg` | `ambient/water/water_spray1.wav` |
+| Comer (`sound = "eat"`: bread, sausage, canned tuna) | `zona/stalkerrp/actions/interface/inv_food.ogg` | `npc/barnacle/barnacle_gulp1.wav` |
+| Beber de botella (`"drink"`/`"vodka"`: water, vodka) | `zona/stalkerrp/actions/interface/inv_vodka.ogg` | `ambient/water/water_spray1.wav` |
+| Lata (`"can"`: soft drink) | `zona/stalkerrp/actions/interface/inv_softdrink.ogg` | `ambient/water/water_spray1.wav` |
 | Estómago (umbral ≤ 25) | `zona/stalkerrp/hunger.mp3` | *sin fallback: sin el addon este feedback se omite* (no hay equivalente digno en HL2) |
+
+> *Enmienda 2026-07-13 (ronda 2 en juego):* los `eat<1-5>.mp3` del pack quedaron
+> descartados —suenan a **tragos**, no a masticado— y con ellos el sorteo aleatorio:
+> `Assets.Sound` devuelve el **primer candidato montado** de la lista, sin `math.random`.
+> `inv_food.ogg` es el masticado canónico; `inv_vodka.ogg` sirve a agua y vodka por
+> igual, y la lata se queda con `inv_softdrink.ogg`.
 
 ---
 
@@ -248,9 +255,9 @@ Evento (server, `hook.Run`, espejo del patrón `Coagulant_*`):
 |---|---|---|
 | `Craving_StatCritical` | `ply, stat ("hunger"\|"hydration"), isCritical` | al cruzar el umbral 25, ambas direcciones |
 
-No hay evento por punto de stat (spam); el continuo se lee por getters/NW2.
-**Enmienda pendiente al cerrar**: la tabla §4 de `CORPUS_Architecture.md` dice
-que Craving "expone: —"; pasa a "getters + `Craving_StatCritical`".
+No hay evento por punto de stat (spam); el continuo se lee por getters/NW2. La
+tabla §4 de `CORPUS_Architecture.md` **ya recoge** esta superficie (enmienda
+2026-07-13: de "—" a "getters + `Craving_StatCritical`").
 
 ---
 
@@ -264,9 +271,9 @@ Sin protocolo propio en v1 — no hay intents de cliente (el consumo pasa por el
 | `NW2Float "craving_hunger"` | S→todos | 0..100, escrito solo si cambió > 0.1 desde el último set |
 | `NW2Float "craving_hydration"` | S→todos | ídem |
 
-(Mismo patrón que el `coagulant_blood` del borrador de Coagulant — barato, y las
-barras de Cargo lo leen client-side sin tick de red.) Si un bloque futuro
-necesita mensajes, van por `Corpus.Net.Register("craving", msg)` →
+(Mismo patrón que el `coagulant_blood` de Coagulant — barato, y las barras de
+Cargo lo leen client-side sin tick de red.) Si un bloque futuro necesita
+mensajes, van por `Corpus.Net.Register("craving", msg)` →
 `corpus_craving_<msg>`, jamás `AddNetworkString` crudo.
 
 ---
@@ -368,18 +375,27 @@ Candidatos diferidos, en orden de afinidad (análisis completo en la semilla §4
 
 ---
 
-## 15. Al bajar a código y verificación prevista
+## 15. La bajada a código y la verificación — hecho
 
-1. Estreno del repo (primera vez con contenido real, roadmap §3 de Corpus):
+Los tres puntos que esta sección planeaba **se cumplieron**; quedan como registro.
+
+1. **Estreno del repo** (primera vez con contenido real, roadmap §3 de Corpus):
    scaffold + `CLAUDE.md` + docs propios (`craving_estado.md`,
    `craving_roadmap.txt`, `CHANGELOG.md`, `craving_convenciones_commits.txt`),
-   template de los hermanos, apuntando a `corpus_flujo_trabajo.txt`.
-2. CHANGELOG con parches `[PENDIENTE]`; sección resumen + link en
-   `CORPUS_Architecture.md` (§9) + enmienda a su tabla §4 (§8 de este doc).
-3. Verificación: harness offline (lupa + stubs) para la matemática pura →
-   `craving_selftest` en juego → flujo real: decay visible en las barras con
-   Cargo, sprint/sobrepeso aceleran, comer desde quick slot restaura y suena,
-   `onUse` con barra llena NO consume, entity §7 con y sin Cargo, muerte por
-   sed sin Coagulant con mensaje propio, reconexión restaura stats, con el
-   addon `corpus_stalker` los modelos son STALKER y sin él caen a HL2/CS:S.
-   **La corre el autor** (flujo §1 PASO 4).
+   template de los hermanos, apuntando a `corpus_flujo_trabajo.txt`. **Hecho**
+   (2026-07-13); el v1 está commiteado y pusheado a `origin/main`.
+2. **CHANGELOG** con los 12 parches del v1, hoy **todos en `[APLICADO]`**. En
+   `CORPUS_Architecture.md`, la sección resumen + link vive en su §9 (Block 4
+   **CERRADO**) y su tabla §4 **ya recoge** la superficie de Craving — la enmienda
+   que este doc prometía está aplicada desde el 2026-07-13 (ver §8). **Hecho.**
+3. **Verificación**: harness offline (lupa + stubs, `dev/harness_craving.py`) verde
+   en ambos realms para la matemática pura → `craving_selftest` → flujo real en
+   juego, que **corrió el autor** (flujo §1 PASO 4) en **tres rondas**
+   (2026-07-13/14): decay visible en las barras con Cargo, sprint/sobrepeso
+   aceleran, comer desde quick slot restaura y suena, `onUse` con barra llena NO
+   consume, entity §7 con **WALK+E** al inventario, muerte por sed sin Coagulant
+   con mensaje propio, reconexión restaura stats, y con el addon `corpus_stalker`
+   los modelos son STALKER mientras que sin él caen a HL2/CS:S. **Hecho.**
+   *Única casilla diferida a pedido del autor*: la pata **sin Cargo** (consumo in
+   situ de la entity + logs de degradación), que el harness sí cubre; se cierra en
+   juego cuando el autor quiera.

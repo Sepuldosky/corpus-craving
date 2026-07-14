@@ -26,12 +26,15 @@ corpus/docs/corpus_flujo_trabajo.txt (canónica del ecosistema).
       re-seleccionaron (entry 11). Queda opcional la pata sin-Cargo del
       checklist, diferida por el autor.
 
-  [2] Primer commit + push del repo cuando el autor lo pida. **Es lo próximo**:
-      el v1 está verificado y el repo GitHub sigue vacío.
+  [2] HECHO (2026-07-14). El v1 quedó commiteado y pusheado a `origin/main`
+      (14 commits: docs + los 10 archivos .lua del módulo — entre ellos
+      shared/corpus_craving_dev.lua, que registra el concommand
+      craving_selftest; no hay ningún archivo con ese nombre).
 
-  [3] Negociar `ApplyExternalCondition` con Coagulant cuando su Block 3 baje a
-      código (hoy el puente es mock-first, arquitectura §4; Coagulant §12 ya
-      lista a Craving como consumidor — falta la vía de condición externa).
+  [3] **Es lo próximo**: negociar `ApplyExternalCondition` con Coagulant cuando
+      su Block 3 cierre (hoy el puente es mock-first, arquitectura §4; Coagulant
+      §12 ya lista a Craving como consumidor — falta la vía de condición
+      externa).
 
 
 2. SIGUIENTE — bloques futuros (orden por afinidad, arquitectura §14)

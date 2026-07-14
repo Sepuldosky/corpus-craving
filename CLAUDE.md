@@ -67,7 +67,7 @@ Un **manifest de carga explícito** (`corpus_craving_init.lua`, único archivo e
 No hay test runner de GMod — el patrón es cargar mapa y confirmar (flujo §1 PASO 4), **la corre el autor**. Capas previas:
 
 1. **`craving_selftest`** (consola, realm que lo invoca): config pura (drenaje, sobrepeso, severity), tabla de ítems, resolución de assets, contrato público, round-trip de estado/Consume si hay jugador, reporte de soft-deps. En listen server, realm server: `lua_run Corpus.GetModule("craving")._SelfTest()`.
-2. **Harness offline** (LuaJIT vía `lupa` + stubs de GMod, carga el framework real de `corpus/`): mismo patrón que verificó Corpus, Cargo y Coagulant; el script se reconstruye en el scratchpad de sesión.
+2. **Harness offline** (LuaJIT vía `lupa` + stubs de GMod, carga el framework real de `corpus/`): mismo patrón que verificó Corpus, Cargo y Coagulant. El script es **permanente**, vive fuera de los repos en [`../dev/harness_craving.py`](../dev/harness_craving.py) y se corre con `python dev/harness_craving.py` desde la raíz del workspace — no se reconstruye por sesión.
 
 Flujo en juego: cargar mapa con corpus/ + craving/ (y opcionalmente cargo/, coagulant/, corpus_stalker) → `craving_selftest` → `craving_set 30 20` y ver hints/estómago → con Cargo: barras en el panel, `Bread` en categoría `food`, comer desde quick slot restaura y suena, con barra llena NO consume → entity `Bread` (Entities → Corpus) con **WALK+E** (E pelado = carry de prop, entry 12) → `craving_set 0 0` sin Coagulant: daño periódico y mensaje de muerte → reconectar restaura stats → tab en Q → Utilities → Corpus → Craving.
 
@@ -75,7 +75,7 @@ Al cerrar un cambio con superficie de runtime: refresca [`docs/craving_estado.md
 
 ## Git / commits
 
-Sigue [`docs/craving_convenciones_commits.txt`](docs/craving_convenciones_commits.txt): `<tipo>(<alcance>): <descripción>` — tipo en inglés, descripción en español, minúscula inicial, sin punto final, imperativo. Alcances de este repo: `config`, `assets`, `core`, `coagulant`, `items`, `entity`, `bars`, `options`, `dev`, `init` (+ `docs`, `chore`).
+Sigue [`docs/craving_convenciones_commits.txt`](docs/craving_convenciones_commits.txt): `<tipo>(<alcance>): <descripción>` — tipo en inglés, descripción en español, minúscula inicial, sin punto final, imperativo. Los 11 alcances de este repo (§3 del doc, que manda): `config`, `assets`, `core`, `coagulant`, `items`, `entity`, `bars`, `options`, `dev`, `init` y `docs`. `chore` **no** es un alcance sino un tipo (§2, junto a `feat`/`fix`/`refactor`/`docs`/`test`).
 
 **Este repo está publicado en GitHub** (`github.com/Sepuldosky/corpus-craving`, público, remote `origin` cableado localmente). No hagas commit ni push salvo que se pida explícitamente.
 
