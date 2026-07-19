@@ -15,6 +15,11 @@ detalle de diseño vive en Craving_Architecture.md (doc particular) — acá NO 
 duplica; solo el orden y el criterio de entrada de cada tramo. Metodología:
 corpus/docs/corpus_flujo_trabajo.txt (canónica del ecosistema).
 
+NOTA DE LECTURA (cita FLU-22 y el voto del autor del 2026-07-19): este doc es
+INTENCIÓN PURA, no autoridad. Los IDs que aparecen acá son CITAS a normas cuya sede
+está en otro lado — este roadmap no acuña ninguna. Un "limpio" del gate de coherencia
+sobre este archivo se reporta NO-AUDITABLE POR DISEÑO.
+
 
 1. INMEDIATO
 --------------
@@ -32,18 +37,23 @@ corpus/docs/corpus_flujo_trabajo.txt (canónica del ecosistema).
       craving_selftest; no hay ningún archivo con ese nombre).
 
   [3] **Es lo próximo**: negociar `ApplyExternalCondition` con Coagulant cuando
-      su Block 3 cierre (hoy el puente es mock-first, arquitectura §4; Coagulant
-      §12 ya lista a Craving como consumidor — falta la vía de condición
-      externa).
+      su Block 3 cierre (hoy el puente es mock-first —cita FLU-17—, arquitectura
+      §4; Coagulant §12 ya lista a Craving como consumidor — falta la vía de
+      condición externa). La firma la congeló CRV-4 desde acá, o sea desde el
+      CONSUMIDOR: el dueño todavía no la ratificó, y eso es la deuda D-5 del
+      registro. Al negociarla se cierra. Mientras tanto rige CRV-2/CRV-3:
+      degradación por CAPACIDAD, no por presencia.
 
 
 2. SIGUIENTE — bloques futuros (orden por afinidad, arquitectura §14)
 ----------------------------------------------------------------------
 
   [4] Cocinar (crudo → cocido): carne de mutante ZONA, fogata o Workbench de
-      Cargo. Arrastra comida cruda/agua de río → enfermedad (misma vía §4) y
-      caza/harvest. Criterio de entrada: v1 verificado + Coagulant Block 3 en
-      juego.
+      Cargo (su diseño está en Workbench_Arquitectura.md, bloque futuro — CRG-50
+      a CRG-54; el patrón de registro es el de siempre: Cargo pone el banco,
+      Craving pone las recetas, cita CRG-1). Arrastra comida cruda/agua de río →
+      enfermedad (misma vía §4) y caza/harvest. Criterio de entrada: v1
+      verificado + Coagulant Block 3 en juego.
 
   [5] Efectos de consumibles: vodka/drunk (screen effects), buffs estilo GAMMA.
       Criterio de entrada: sistema de efectos temporales diseñado (bloque
@@ -55,8 +65,9 @@ corpus/docs/corpus_flujo_trabajo.txt (canónica del ecosistema).
   [7] Consumir eventos de Coagulant (sangrado ↑ sed) — azúcar, cuando [3] cierre.
 
 Descartados salvo pedido explícito: spoilage (rompe el modelo stackeable de
-Cargo), farming (fuera del espíritu del ecosistema). Fronteras duras: stamina/
-sueño = Coagulant; radiación sin dueño; NPCs = Cortex.
+Cargo), farming (fuera del espíritu del ecosistema). Fronteras duras (cita COR-1 y
+COR-10: la lógica de dominio ajena no baja acá, y nada de esto sube al framework):
+stamina/sueño = Coagulant; radiación sin dueño; NPCs = Cortex.
 
 
 =====================================================

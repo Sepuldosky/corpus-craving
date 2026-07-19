@@ -358,3 +358,33 @@ tocan este repo.
   histórico, ahora anotado. **[APLICADO 2026-07-19]**
 
 Verificación: checker en verde + suite 12/12. Sin superficie de runtime.
+
+---
+
+## PARCHES DE sesión D-13: pre-2.º COMPLETO — 2026-07-19
+
+Parte de la tanda multi-repo guiada por `dev/PROMPT_d12_d13_segundo_completo.txt`, que cerró
+las deudas **D-12** y **D-13** del registro. Acá lo que toca a este repo. Solo prosa: **ninguna
+norma cambió de contenido**.
+
+- PARCHE 1 — **`CRV-19` acuñado: la tabla de alcances de `craving_convenciones_commits.txt`
+  §3 es norma y ahora tiene ID.** Ese doc era uno de los **10 docs ciegos** del hueco H1 del
+  COMPLETO. La §3 es por-repo y jamás se hereda del framework (cita GIT-6); el `CLAUDE.md` la
+  resume y **el doc manda**. Los 11 alcances se derivaron del propio doc. Nota: `coagulant`
+  es alcance propio y legítimo — nombra el **puente** hacia ese módulo (soft-dep), no código
+  ajeno. **[APLICADO 2026-07-19]**
+- PARCHE 2 — **`craving_roadmap.txt` pasa de ciego a citante**, sin acuñar (voto del autor:
+  un roadmap es intención pura). NOTA DE LECTURA + citas: el tramo de
+  `ApplyExternalCondition` cita **CRV-4** y **FLU-17**, y deja explícito que la firma la
+  congeló **el consumidor** y que la ratificación del dueño es la deuda **D-5**; las
+  fronteras duras citan **COR-1**/**COR-10**; el tramo de cocinar cita la familia nueva de
+  Workbench (**CRG-50**..**CRG-54**) y **CRG-1**. **[APLICADO 2026-07-19]**
+- PARCHE 3 — **`Craving_Block4_Semilla.md` (217 líneas, cero IDs) se declara REGISTRO
+  HISTÓRICO** y recibe citas. Su §1 «Marco fijo» describía el estado ANTERIOR al volcado a la
+  arquitectura, así que además de citar (**COR-13**, **CRG-1**, **FLU-17**, **CRV-4**,
+  **COR-5**, **COR-1**/**COR-10**) se anotan en sitio los **dos puntos donde lo implementado
+  la superó**: las defs van en AMBOS realms (**COR-12**, lección de la primera pasada en
+  juego) y la degradación es por **CAPACIDAD**, no por presencia (**CRV-2**/**CRV-3**). Donde
+  el marco fijo y la arquitectura difieran, manda la arquitectura. **[APLICADO 2026-07-19]**
+
+Verificación: checker en verde sobre 207 IDs + suite 12/12. Sin superficie de runtime.

@@ -12,6 +12,15 @@
 >
 > Metodología: planificación densa por bloques + vertical slice
 > (`../../corpus/docs/corpus_flujo_trabajo.txt` §2-§3).
+>
+> **NOTA DE LECTURA (2026-07-19)** — el volcado a `Craving_Architecture.md` **ya
+> ocurrió** y el Block 4 está cerrado y verificado en juego: este doc es **registro
+> histórico**, no lista de trabajo ni autoridad. Los IDs que aparecen abajo son
+> **CITAS** a normas cuya sede es la arquitectura o el framework — la semilla no
+> acuña ninguna (cita **FLU-22**: la sede gana; voto del autor del 2026-07-19). Un
+> "limpio" del gate de coherencia sobre este archivo se reporta **NO-AUDITABLE POR
+> DISEÑO**. Donde el marco fijo de §1 quedó superado por lo implementado, manda la
+> arquitectura.
 
 ---
 
@@ -22,20 +31,27 @@
   si el diseño decide emitir eventos, es enmienda explícita a esa tabla). Consume:
   - **Cargo** (soft, **ya disponible y verificado**): consumibles vía
     `Cargo.Items.Register` — Craving owns el `onUse` (devuelve `true` → Cargo
-    consume 1 unidad), Cargo owns contenedor/peso/render (§3 y §5 de la
-    arquitectura de Corpus). Cargo además ya reserva las barras de Craving en su
-    panel de estado: `Cargo.StatusPanel.RegisterBar` con `hunger`/`hydration` es
-    el ejemplo literal de su §11.
-  - **Coagulant** (soft, opcional, **mock-first**): efectos de inanición/
-    deshidratación sobre la salud. Coagulant está pre-Block 3 y todavía no expone
-    eventos clínicos — se congela el contrato esperado y se degrada honesto.
+    consume 1 unidad, cita **COR-13**), Cargo owns contenedor/peso/render (§3 y §5
+    de la arquitectura de Corpus, cita **CRG-1**). Cargo además ya reserva las
+    barras de Craving en su panel de estado: `Cargo.StatusPanel.RegisterBar` con
+    `hunger`/`hydration` es el ejemplo literal de su §11.
+    *(Superado por lo implementado: la def **y** su `onUse` se registran en AMBOS
+    realms — cita **COR-12**, lección de la primera pasada en juego.)*
+  - **Coagulant** (soft, opcional, **mock-first** — cita **FLU-17**): efectos de
+    inanición/deshidratación sobre la salud. Coagulant está pre-Block 3 y todavía
+    no expone eventos clínicos — se congela el contrato esperado y se degrada
+    honesto. *(La firma congelada es la de **CRV-4**; su ratificación por el dueño
+    sigue abierta como deuda D-5.)*
 - **Degradación honesta** (tabla §2): sin Cargo → fallback a comestibles/bebibles
   en mundo (la arquitectura ya promete "Craving ya ship sus fallbacks HL2", §5);
   sin Coagulant → sin efectos clínicos, solo hambre/sed → muerte por la vía del
-  HP nativo. Nunca crash, nunca asunción.
-- **Reglas de ecosistema:** nada de dominio ajeno acá (grid/peso/quick slots =
-  Cargo; heridas/vitales/**stamina** = Coagulant — Cargo ya lo nombró dueño de la
-  stamina en su §5; daño/armadura = Caliber). Persistencia y net entran recién
+  HP nativo. Nunca crash, nunca asunción (cita **COR-5**).
+  *(Precisado por lo implementado: la degradación es por **CAPACIDAD**, no por
+  presencia — cita **CRV-2** y **CRV-3**: un Coagulant montado sin la función cae
+  al mismo fallback que su ausencia.)*
+- **Reglas de ecosistema** (cita **COR-1** y **COR-10**): nada de dominio ajeno acá
+  (grid/peso/quick slots = Cargo; heridas/vitales/**stamina** = Coagulant — Cargo ya
+  lo nombró dueño de la stamina en su §5; daño/armadura = Caliber). Persistencia y net entran recién
   cuando el estado y el protocolo diseñados lo justifiquen. Strings de cara al
   jugador en **inglés**; docs/commits/logs en español. Estilo de comentarios de
   código: se fija al estrenar el scaffold (sugerencia: español, línea
