@@ -142,6 +142,13 @@ del autor): el repo Craving (MIT, publicable) solo referencia rutas con
 fallback, jamás incluye los assets GSC. Detalle en `Craving_Architecture.md`
 §5-§6.
 
+> *Enmienda 2026-07-14: ese addon nació como `corpus_zona_assets` dentro de
+> `dev/` y ese mismo 2026-07-13 se promovió a **séptima raíz del workspace**
+> (`corpus-stalker/`, git propio y público, assets GSC en `.gitignore`). La
+> redacción de arriba quedó congelada en la ruta previa — ver
+> `Craving_Architecture.md` §5-§6 (enmienda) y CHANGELOG PARCHE 3
+> [APLICADO 2026-07-14].*
+
 ### D. Fuentes sin inventario — el fallback "HL2"
 La arquitectura promete fallback a "entities HL2 comestibles/bebibles", pero HL2
 no tiene ítems de comida nativos — hay que definir qué significa:

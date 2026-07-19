@@ -30,7 +30,7 @@ Soft-deps, siempre lazy-check / `Corpus.OnReady`, jamás asumidas:
 | **Coagulant** (Block 3 **en código** — slices 1-3 verificados en juego, UI pendiente; puente mock-first: todavía **no expone condición externa**) | contrato esperado `ApplyExternalCondition` (§4) | daño periódico al HP nativo hasta la muerte (§3) |
 | **Corpus S.T.A.L.K.E.R.** (addon de contenido, **séptima raíz del workspace** `../corpus-stalker/`, opcional; **sus assets GSC no se versionan** — el addon sí) | modelos y sonidos ZONA (§6) | modelos HL2/CS:S conocidos + sonidos base del engine |
 
-Dirección única: Craving detecta a sus peers; nadie detecta a Craving. Fuera de
+**CRV-13 — Dirección única:** Craving detecta a sus peers; nadie detecta a Craving. Fuera de
 la frontera (no-scope duro, §14): stamina/fatiga/sueño (Coagulant), radiación
 (sin dueño), contenedor/peso (Cargo), NPCs (Cortex).
 
@@ -38,7 +38,7 @@ la frontera (no-scope duro, §14): stamina/fatiga/sueño (Coagulant), radiación
 
 ## 2. Modelo de stats
 
-Dos stats por jugador, **server-autoritativos**, escala **100 → 0** (100 =
+**CRV-9** — Dos stats por jugador, **server-autoritativos**, escala **100 → 0** (100 =
 saciado; la barra se vacía — consistente con el `getValue -> 0..100` de las
 barras de Cargo):
 
@@ -59,7 +59,7 @@ drain(stat) = base_stat × mult_actividad × mult_sobrepeso × craving_decay_sca
 | `mult_sobrepeso` (Cargo presente: `CARGO.Inventory.GetWeightFraction(ply)`) | lerp 1.0 → 1.5 entre fracción 0.5 y 1.0, ambos stats | cargar pesado cuesta comida y agua |
 
 Sin Cargo, `mult_sobrepeso` = 1 (lazy-check + pcall, degradación honesta). Los
-stats se clampean a [0, 100] siempre — no hay valores negativos ni overfill.
+stats se clampean a [0, 100] siempre (CRV-9) — no hay valores negativos ni overfill.
 
 ---
 
@@ -79,7 +79,7 @@ por dirección, no por tick):
   genérico en v1 (killfeed custom = bloque futuro).
 - **Respawn** (≠ reconexión, §12): stats a **75 / 75** (tunable) — el loop
   importa desde el primer minuto sin castigar el respawn.
-- El daño del fallback usa `DMG_GENERIC` con el mundo como attacker — nunca
+- **CRV-11** — El daño del fallback usa `DMG_GENERIC` con el mundo como attacker — nunca
   suplanta a otro jugador ni dispara lógica de PvP ajena.
 
 ---
@@ -87,7 +87,7 @@ por dirección, no por tick):
 ## 4. Puente Coagulant — contrato mock-first
 
 Coagulant es el dueño clínico del jugador; cuando está, la inanición se vuelve
-un **estado clínico**, no un chip de HP. Contrato **esperado** (patrón mock-first,
+un **estado clínico**, no un chip de HP. Contrato **esperado** (**CRV-4** — patrón mock-first,
 flujo §3 — congelado acá, **pendiente de negociar** con el Block 3 de Coagulant,
 cuyo **código actual** (slices 1-3 verificados en juego) expone
 tratamiento/getters/eventos pero **todavía ninguna vía de condición externa**):
@@ -102,15 +102,17 @@ COAGULANT.ApplyExternalCondition(ply, id, severity)
 -- sangre con severity alto; la muerte pasa a ser suya).
 ```
 
+**CRV-17 —** La severity es `(25 − stat) / 25` **clampeada a [0,1]**: vale 0 con el stat en el umbral severo (25) o más, y 1 con el stat en 0 — 0 además LIMPIA la condición. Es función pura de config, cubierta por el selftest.
+
 Reglas del puente (server, `corpus_craving_coagulant.lua`):
 
-1. Lazy-check en el tick: `Corpus.GetModule("coagulant")` + **capability check**
+1. **CRV-2** — Lazy-check en el tick: `Corpus.GetModule("coagulant")` + **capability check**
    (`isfunction(coag.ApplyExternalCondition)`) + pcall. Coagulant montado pero
    sin la función (versión vieja) = fallback HP igual que sin Coagulant — la
    degradación es por *capacidad*, no por presencia.
-2. Se llama **on-change** (cuando la severity redondeada a 2 decimales cambia),
+2. **CRV-5** — Se llama **on-change** (cuando la severity redondeada a 2 decimales cambia),
    no cada tick — sin spam.
-3. Mientras la delegación está activa, Craving **no aplica daño de HP** — un solo
+3. **CRV-3** — Mientras la delegación está activa, Craving **no aplica daño de HP** — un solo
    dueño de la muerte a la vez.
 4. Dirección única confirmada por Coagulant (§12: "Coagulant **no** detecta a
    Craving"). Consumir los eventos `Coagulant_*` (p.ej. sangrado ↑ sed) queda
@@ -126,7 +128,8 @@ existir, comparte la tabla de valores). El registro corre en **ambos realms**
 (archivo shared): el snapshot de Cargo solo transporta defs autogen, así que el
 cliente necesita registrar las suyas localmente para que el grid las renderice
 y el menú ofrezca "Use" (`isfunction(def.onUse)`); el `onUse` en sí solo corre
-en server. Categoría única **`food`** (propuesta:
+en server (cita **COR-12**, cuya sede con la causa completa es
+`../../corpus/docs/CORPUS_Architecture.md` §5). Categoría única **`food`** (propuesta:
 un solo tab en el grid; `Items.RegisterCategory` la auto-registra). Campos
 contra el schema real de Cargo (`corpus_cargo_items.lua`, verificado):
 `id`, `name`, `weight`, `class = "stackable"`, `category`, `model`, `trivia`,
@@ -144,7 +147,7 @@ contra el schema real de Cargo (`corpus_cargo_items.lua`, verificado):
 - **Consumo instantáneo** en el `onUse`: aplicar restore (clamp a 100), emitir
   sonido (§6), devolver `true`. Los quick slots F1-F4 de Cargo ya dan el flujo
   de uso rápido — no se inventa animación ni progress bar en v1.
-- **Anti-desperdicio**: si el stat relevante está ≥ 98, `onUse` devuelve
+- **CRV-8 — Anti-desperdicio**: si el stat relevante está ≥ 98, `onUse` devuelve
   `false` + hint `You are not hungry.` / `You are not thirsty.` — Cargo **no**
   consume la unidad (verificado: solo consume con `true`). Para ítems mixtos
   (tuna, soft drink) manda el stat mayor del def.
@@ -218,7 +221,7 @@ sistema de scripted_ents, no el manifest; resuelve el módulo en runtime, patró
 Cargo). Spawnable desde el menú Entities → categoría **Corpus** (junto al crate
 de Cargo), una entrada por def de §5; el def id viaja en un campo de la entity.
 
-Comportamiento al **WALK + E (USE)** — la toma es deliberada, misma convención
+**CRV-15** — Comportamiento al **WALK + E (USE)** — la toma es deliberada, misma convención
 de mundo que los drops de Cargo *(enmienda 2026-07-13, pedida por el autor en
 la ronda 3: con E pelado la entity se carga como prop HL2 y re-E la suelta; el
 gate vive en el propio `ENT:Use` porque el world gate de Cargo solo cubre sus
@@ -240,7 +243,7 @@ agua del mundo (D3).
 
 ## 8. Contrato público
 
-Bloque CONTRATO del init — todo lo demás es off-contract por convención:
+**CRV-1** — Bloque CONTRATO del init; todo lo demás es off-contract por convención:
 
 ```lua
 CRAVING.GetHunger(ply)            -- 0..100 (shared: server lee estado, client lee NW2)
@@ -268,13 +271,13 @@ Sin protocolo propio en v1 — no hay intents de cliente (el consumo pasa por el
 
 | Canal | Dirección | Contenido |
 |---|---|---|
-| `NW2Float "craving_hunger"` | S→todos | 0..100, escrito solo si cambió > 0.1 desde el último set |
+| `NW2Float "craving_hunger"` | S→todos | 0..100, escrito solo si cambió > 0.1 desde el último set (**CRV-18**) |
 | `NW2Float "craving_hydration"` | S→todos | ídem |
 
 (Mismo patrón que el `coagulant_blood` de Coagulant — barato, y las barras de
 Cargo lo leen client-side sin tick de red.) Si un bloque futuro necesita
 mensajes, van por `Corpus.Net.Register("craving", msg)` →
-`corpus_craving_<msg>`, jamás `AddNetworkString` crudo.
+`corpus_craving_<msg>`, jamás `AddNetworkString` crudo (cita **COR-4**).
 
 ---
 
@@ -308,7 +311,7 @@ para esto"):
 | Convar | Realm | Default | Efecto |
 |---|---|---|---|
 | `craving_enabled` | sv | 1 | apaga todo (tick inerte, barras no registran) |
-| `craving_decay_scale` | sv | 1.0 | multiplicador global de decay; **0 = congela hambre/sed** (el "off suave" para sandbox puro, decisión F) |
+| `craving_decay_scale` | sv | 1.0 | **CRV-16** — multiplicador global de decay; **0 = congela hambre/sed** (el "off suave" para sandbox puro, decisión F) |
 | `craving_damage_scale` | sv | 1.0 | multiplicador del daño del fallback sin Coagulant |
 | `craving_stomach_sounds` | sv | 1 | on/off estómago audible a otros (§3) |
 | `craving_hints` | cl | 1 | on/off hints de umbral |
@@ -320,13 +323,13 @@ Los números de balance (§2, §3, §5) viven en tablas de
 
 ## 12. Persistencia
 
-Vía `Corpus.Data`, namespace `craving` (contrato 3 del framework):
+Vía `Corpus.Data`, namespace `craving` (cita **COR-3**, contrato 3 del framework):
 
 - **Clave**: `state_<steamid64>` → `{ hunger, hydration }`.
 - **Save**: `PlayerDisconnected` + `ShutDown` (nada de autosave por tick — dos
   floats no lo justifican).
 - **Load**: al primer spawn del jugador en la sesión; sin archivo → 100/100.
-- **Reconexión ≠ respawn** (decisión F): reconectar restaura lo persistido
+- **CRV-10 — Reconexión ≠ respawn** (decisión F): reconectar restaura lo persistido
   (cierra el exploit de reconectar para comer gratis); morir aplica el 75/75
   de §3. No hay decay offline en v1.
 

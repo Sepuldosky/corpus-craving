@@ -28,7 +28,8 @@ nunca los asume.
   con uno incapaz), daño periódico al HP con mensaje de muerte propio.
 - **Persistencia** por SteamID64 vía `Corpus.Data`; el respawn devuelve 75/75.
 - Modelos y sonidos salen del addon de contenido **Corpus S.T.A.L.K.E.R.** si está montado;
-  si no, caen a **HL2/CS:S** por lista de candidatos.
+  si no, caen a **HL2/CS:S** por lista de candidatos (los modelos siempre tienen fallback;
+  los sonidos sin equivalente digno —el rugido de estómago— simplemente se omiten).
 
 En diseño / sin implementar: cocinar, efectos de consumibles (la borrachera del vodka, buffs),
 cantimplora rellenable.

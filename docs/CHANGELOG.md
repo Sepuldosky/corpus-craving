@@ -293,3 +293,68 @@ del repo.
   confesión de sus propios encabezados, derivas que la primera ronda **no vio**. La
   intro pasa a desglosar los cuatro racimos reales (1-5 / 6-7 / 8-9 / 10-13) en vez de
   atribuirlos todos a una sola causa. **[APLICADO 2026-07-14]**
+
+---
+
+## PARCHES DE sesión Etiquetado de IDs normativos (deuda D-7) — 2026-07-19
+
+Tanda multi-repo del ecosistema, guiada por `dev/PROMPT_d7_etiquetado_ids.txt` (§8 del flujo).
+Solo prosa: **ninguna norma cambió**. Cada sede que el registro
+(`../corpus/docs/ids.yaml`) declara ahora lleva su ID visible, para que un lector que
+aterriza en el doc vea de qué norma se trata sin abrir el registro, y para que el gate de
+coherencia (§7.8) pueda contrastar el título del yaml contra la prosa de su sede.
+
+- PARCHE 1 — **15 de 16 IDs de la familia `CRV` etiquetados en su sede.**
+  Los 1 restantes NO se etiquetaron a propósito: sus sedes viven en archivos `.lua`,
+  en el CHANGELOG, en el estado o en el roadmap. Etiquetar ahí volvería **definitorio** un
+  comentario, que es lo que **FLU-26** prohíbe, o tocaría un doc que no se reescribe
+  (**FLU-14**). Son deuda **D-3** del registro y se cierran moviendo la sede a un doc —
+  decisión de diseño, no mecánica. **[APLICADO 2026-07-19]**
+
+- PARCHE 2 — **Ocho copias pasan a CITAR por ID:** `COR-2`/`COR-7`, `COR-5`, `COR-13`,
+  `COR-6`, `COR-4`, `COR-3` y **`COR-12`** (la copia grande de la deuda **D-1**, en
+  `Craving_Architecture.md` §5, ahora con puntero a su sede canónica). Además, dos contratos
+  del `CLAUDE.md` que re-enunciaban normas **propias** (`CRV-1`, `CRV-2`/`CRV-3`) pasan
+  a citarlas con puntero a la arquitectura — evita dos definitorios del mismo ID.
+  **[APLICADO 2026-07-19]**
+
+Verificación: `corpus/.claude/check-ids/corpus_check_ids.ps1` en verde (una etiqueta mal
+tipeada habría salido como `HUERFANO_DOC`). Sin superficie de runtime: nada que cargar en
+un mapa, y **ningún check de planilla nace de esta tanda** (FLU-37).
+
+---
+
+## PARCHES DE sesión Anti-drift: cierre de votos — 2026-07-19
+
+Tanda multi-repo guiada por `dev/PROMPT_cierre_antidrift.txt`: curaduría D-10 del registro
+(votada por el autor), parte que toca a este repo.
+
+- PARCHE 1 — **Dos títulos fusionados del registro, partidos con ancla propia:** la fórmula
+  de severity gana enunciado en prosa en §4 como **`CRV-17`** (`(25 − stat)/25` clampeada a
+  [0,1]; antes vivía solo en el comentario del bloque de código) — `CRV-5` queda con el
+  reporte on-change; y el espejo NW2 escrito solo si cambió > 0.1 es ahora **`CRV-18`**
+  (§9) — `CRV-9` queda server-autoritativo + clamp, con la línea del clamp de §2 ahora
+  etiquetada. **[APLICADO 2026-07-19]**
+
+Verificación: `corpus/.claude/check-ids/corpus_check_ids.ps1` en verde sobre 197 IDs. Sin
+superficie de runtime, y **ningún check de planilla nace de esta tanda** (FLU-37).
+
+---
+
+## PARCHES DE sesión Anti-drift: reparación del COMPLETO — 2026-07-19
+
+Aplica los hallazgos del acta `corpus/docs/auditorias/2026-07-19_coherencia_docs.md` que
+tocan este repo.
+
+- PARCHE 1 — **2.4 (ALTA):** CRV-7 deja de enunciar el universal «el último candidato de
+  cada lista es SIEMPRE HL2 vanilla»: vale para **modelos** (`Assets.Model` garantiza
+  ruta aunque nada esté montado); en **sonidos**, `Assets.Sound` devuelve `nil` sin
+  candidatos montados, y el rugido de estómago es la **excepción declarada** sin
+  fallback (§6) — no se le agrega uno. El README barre su eco y el registro sigue a la
+  sede corregida. **[APLICADO 2026-07-19]**
+- PARCHE 2 — **2.17:** la semilla gana la enmienda de ruta: el addon de assets dejó de
+  vivir en `dev/` el mismo 2026-07-13 — es la séptima raíz `corpus-stalker/` (git propio
+  y público, assets GSC en `.gitignore`). La redacción original queda como registro
+  histórico, ahora anotado. **[APLICADO 2026-07-19]**
+
+Verificación: checker en verde + suite 12/12. Sin superficie de runtime.
