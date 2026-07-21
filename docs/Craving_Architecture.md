@@ -27,7 +27,7 @@ Soft-deps, siempre lazy-check / `Corpus.OnReady`, jamás asumidas:
 | Peer | Consume | Sin él, degrada a |
 |---|---|---|
 | **Cargo** (en código, verificado) | `Items.Register` (consumibles §5), `StatusPanel.RegisterBar` (barras §10), `Inventory.GetWeightFraction` (decay por sobrepeso §2) | comida solo por entities de mundo (§7); sin barras (feedback indirecto §10); sin modificador de sobrepeso |
-| **Coagulant** (Block 3 **en código** — slices 1-3 verificados en juego, UI pendiente; puente mock-first: todavía **no expone condición externa**) | contrato esperado `ApplyExternalCondition` (§4) | daño periódico al HP nativo hasta la muerte (§3) |
+| **Coagulant** (Block 3 **CERRADO** — 4 slices verificados en juego, 2026-07-20; puente mock-first: todavía **no expone condición externa**) | contrato esperado `ApplyExternalCondition` (§4) | daño periódico al HP nativo hasta la muerte (§3) |
 | **Corpus S.T.A.L.K.E.R.** (addon de contenido, **séptima raíz del workspace** `../corpus-stalker/`, opcional; **sus assets GSC no se versionan** — el addon sí) | modelos y sonidos ZONA (§6) | modelos HL2/CS:S conocidos + sonidos base del engine |
 
 **CRV-13 — Dirección única:** Craving detecta a sus peers; nadie detecta a Craving. Fuera de
@@ -88,8 +88,8 @@ por dirección, no por tick):
 
 Coagulant es el dueño clínico del jugador; cuando está, la inanición se vuelve
 un **estado clínico**, no un chip de HP. Contrato **esperado** (**CRV-4** — patrón mock-first,
-flujo §3 — congelado acá, **pendiente de negociar** con el Block 3 de Coagulant,
-cuyo **código actual** (slices 1-3 verificados en juego) expone
+flujo §3 — congelado acá, **pendiente de negociar** (deuda D-5) con Coagulant,
+cuyo Block 3 ya cerró (4 slices verificados en juego) y expone
 tratamiento/getters/eventos pero **todavía ninguna vía de condición externa**):
 
 ```lua

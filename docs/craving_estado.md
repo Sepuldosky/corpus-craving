@@ -39,10 +39,10 @@ pusheado a `origin/main`**)
 ## Remanentes / deuda conocida
 
 - **El puente Coagulant es mock-first**: `ApplyExternalCondition` no existe aún en
-  Coagulant (0 hits en su `lua/`). Su Block 3 tiene los slices 1-3 verificados en
-  juego y el slice 4 (UI) en código, pendiente de la ronda 7 — esa ronda cierra el
-  Block: negociarla ahí. La degradación por capacidad cubre el hueco, verificada
-  en juego.
+  Coagulant (0 hits en su `lua/`). Su Block 3 está **CERRADO** (los 4 slices
+  verificados en juego, 2026-07-20), pero la firma sigue sin ratificarse — es la
+  deuda D-5, a negociar cuando se retome el cross-repo. La degradación por capacidad
+  cubre el hueco, verificada en juego.
 - **Footprints del grid** (sausage 1×1, bread 2×1, botellas 1×2): autogen de Cargo
   por bounds del modelo. Si el autor quiere otros: `cargo_icon_edit` (override por
   def) o `def.size` explícito — data, no código.
