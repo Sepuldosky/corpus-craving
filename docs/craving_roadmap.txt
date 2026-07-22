@@ -36,8 +36,9 @@ sobre este archivo se reporta NO-AUDITABLE POR DISEÑO.
       shared/corpus_craving_dev.lua, que registra el concommand
       craving_selftest; no hay ningún archivo con ese nombre).
 
-  [3] **Es lo próximo**: negociar `ApplyExternalCondition` con Coagulant cuando
-      su Block 3 cierre (hoy el puente es mock-first —cita FLU-17—, arquitectura
+  [3] **Es lo próximo**: negociar `ApplyExternalCondition` con Coagulant ahora
+      que su Block 3 cerró (4 slices verificados en juego, 2026-07-20) — hoy el
+      puente es mock-first —cita FLU-17—, arquitectura
       §4; Coagulant §12 ya lista a Craving como consumidor — falta la vía de
       condición externa). La firma la congeló CRV-4 desde acá, o sea desde el
       CONSUMIDOR: el dueño todavía no la ratificó, y eso es la deuda D-5 del

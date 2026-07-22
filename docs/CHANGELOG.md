@@ -388,3 +388,21 @@ norma cambió de contenido**.
   el marco fijo y la arquitectura difieran, manda la arquitectura. **[APLICADO 2026-07-19]**
 
 Verificación: checker en verde sobre 207 IDs + suite 12/12. Sin superficie de runtime.
+
+---
+
+## PARCHES DE sesión Reparación del gate de coherencia (acta 2026-07-22) — 2026-07-22
+
+Tanda de reparación documental propuesta por el gate de coherencia en su corrida COMPLETO del
+2026-07-22 (`../../corpus/docs/auditorias/2026-07-22_coherencia_docs.md`; el gate propone, el
+autor dispone). Acá lo que toca a este repo. Solo prosa; **ninguna norma cambió de contenido**.
+
+- PARCHE 1 — **Hallazgo 2.8 del acta (pase de valor):** `docs/craving_roadmap.txt` [3] decía
+  negociar `ApplyExternalCondition` con Coagulant «cuando su Block 3 cierre», presuponiéndolo
+  abierto. El Block 3 de Coagulant está CERRADO desde el 2026-07-20 (`coagulant_estado.md`; 4
+  slices verificados en juego). §7.1: estado.md (nivel 2) gana al roadmap (nivel 6). Se pasa a
+  «ahora que su Block 3 cerró»; se preserva que el puente sigue mock-first y que la
+  ratificación del dueño es la deuda D-5 (aún abierta). **[APLICADO 2026-07-22]**
+
+Verificación: sin superficie de runtime (solo docs). Cambios trazables al acta (§7.1). No
+commiteado ni pusheado (GIT-7).
