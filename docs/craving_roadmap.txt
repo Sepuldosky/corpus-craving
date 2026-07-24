@@ -65,6 +65,15 @@ sobre este archivo se reporta NO-AUDITABLE POR DISEÑO.
 
   [7] Consumir eventos de Coagulant (sangrado ↑ sed) — azúcar, cuando [3] cierre.
 
+  [8] Props comestibles de HL2 como base (pedido del autor 2026-07-24): más
+      props de uso libre, e integrar TODO prop comestible de HL2 como
+      consumible — botellas, latas, bolsa de comida, comida china, sandía,
+      etc. Consumen los sonidos GENERALES del banco de corpus
+      (sound/corpus/craving/: variantes por tipo ya ordenadas — soda, cola,
+      cerveza, plato, bolsa de papel...), NUNCA los zona/* de corpus-stalker
+      (reservados a la comida de la Zona — separación sonidos/ítems).
+      Enlaza con [6] (D2: props del mapa comestibles).
+
 Descartados salvo pedido explícito: spoilage (rompe el modelo stackeable de
 Cargo), farming (fuera del espíritu del ecosistema). Fronteras duras (cita COR-1 y
 COR-10: la lógica de dominio ajena no baja acá, y nada de esto sube al framework):

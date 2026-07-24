@@ -1,10 +1,13 @@
 -- corpus_craving_assets.lua — resolución de assets por lista de candidatos (SHARED)
--- Craving_Architecture.md §6. Los assets STALKER viven en el addon de contenido
--- "Corpus S.T.A.L.K.E.R." (repo corpus-stalker/, assets no versionados); este
--- repo solo referencia rutas de juego, que son independientes de dónde viva el
--- addon en disco. Mismo espíritu que el helper ZonaModel de Cargo, pero por
--- lista: el primer candidato montado gana. Se queda acá — no sube a Corpus ni
--- se importa de Cargo (duplicar 15 líneas es más barato que acoplar dominios).
+-- Craving_Architecture.md §6. Dos fuentes de assets, ninguna versionada y
+-- ninguna asumida: los sonidos de consumo GENERALES viven en el banco del
+-- framework (corpus/sound/corpus/craving/, COR-17) y los modelos + el estómago
+-- ZONA en el addon de contenido "Corpus S.T.A.L.K.E.R." (corpus-stalker/,
+-- STK-2); este repo solo referencia rutas de juego, que son independientes de
+-- dónde viva cada addon en disco. Mismo espíritu que el helper ZonaModel de
+-- Cargo, pero por lista: el primer candidato montado gana. Se queda acá — no
+-- sube a Corpus ni se importa de Cargo (duplicar 15 líneas es más barato que
+-- acoplar dominios).
 
 local CRAVING = Corpus.GetModule("craving")
 
@@ -32,19 +35,24 @@ function Assets.Sound(candidates)
 end
 
 -- ============================================================
--- Sets concretos del v1 (§6) — rutas ZONA verbatim del pack actionsounds;
--- fallbacks del engine. Selección re-hecha tras la ronda 2 en juego
--- (2026-07-13): los eat1-5.mp3 del pack suenan a tragos e inv_softdrink a
--- líquido derramándose — inv_food.ogg es el masticado canónico de STALKER,
--- inv_vodka.ogg los tragos de botella (sirven para agua y vodka por igual).
+-- Sets concretos del v1 (§6) — banco de sonidos GENERAL del ecosistema
+-- (corpus/sound/corpus/craving/, ports de GAMMA no versionados: COR-17);
+-- fallbacks del engine. Decisión del autor 2026-07-24 (separación sonidos/
+-- ítems): los zona/stalkerrp/* de corpus-stalker quedan RESERVADOS para la
+-- comida propia de ese addon — estos consumibles genéricos comen con el banco
+-- general. La selección por oído de la ronda 2 (2026-07-13: "el nombre del
+-- archivo miente, validar por oído") sigue vigente como método; el mapa de
+-- variantes vive en sound/corpus/craving/about.txt.
 -- ============================================================
 
 local CONSUME_SETS = {
-    eat   = { "zona/stalkerrp/actions/interface/inv_food.ogg", "npc/barnacle/barnacle_gulp1.wav" },
-    drink = { "zona/stalkerrp/actions/interface/inv_vodka.ogg", "ambient/water/water_spray1.wav" }, -- tragos de botella
-    can   = { "zona/stalkerrp/actions/interface/inv_softdrink.ogg", "ambient/water/water_spray1.wav" }, -- lata con gas
-    vodka = { "zona/stalkerrp/actions/interface/inv_vodka.ogg", "ambient/water/water_spray1.wav" },
+    eat   = { "corpus/craving/food_use.ogg", "npc/barnacle/barnacle_gulp1.wav" }, -- masticado
+    drink = { "corpus/craving/drink_flask.ogg", "ambient/water/water_spray1.wav" }, -- tragos de cantimplora
+    can   = { "corpus/craving/drink_soda_use.ogg", "ambient/water/water_spray1.wav" }, -- lata con gas
+    vodka = { "corpus/craving/vodka_use.ogg", "ambient/water/water_spray1.wav" },
 }
+-- El estómago SÍ sigue en el addon de contenido: excepción declarada CRV-7
+-- (sin fallback digno en HL2, §6) — no es un sonido de consumo de ítem.
 Assets.STOMACH = { "zona/stalkerrp/hunger.mp3" } -- sin fallback (§6)
 
 -- Sonido de consumo para un kind de la tabla de ítems

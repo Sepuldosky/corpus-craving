@@ -406,3 +406,29 @@ autor dispone). Acá lo que toca a este repo. Solo prosa; **ninguna norma cambi�
 
 Verificación: sin superficie de runtime (solo docs). Cambios trazables al acta (§7.1). No
 commiteado ni pusheado (GIT-7).
+
+---
+
+## PARCHES DE sesión Separación sonidos/ítems: Craving come del banco general — 2026-07-24
+
+Decisión del autor: los sonidos de consumo GENERALES viven en el framework
+(`corpus/sound/corpus/craving/`, ports de GAMMA no versionados — COR-17) y los
+`zona/stalkerrp/*` de corpus-stalker quedan RESERVADOS para la comida propia de la Zona.
+Hay separación entre sonidos e ítems: si Craving suma props nuevos propios, consumen el
+banco general.
+
+- PARCHE 1 — feat(assets): `CONSUME_SETS` pasa del pack ZONA al banco general —
+  `eat` → `corpus/craving/food_use.ogg`, `drink` → `drink_flask.ogg`, `can` →
+  `drink_soda_use.ogg`, `vodka` → `vodka_use.ogg` — con los mismos fallbacks del engine
+  (la resolución por lista de candidatos no cambia: primer montado gana, sin el banco cae
+  al fallback). `Assets.STOMACH` queda INTACTO en `zona/stalkerrp/hunger.mp3` (excepción
+  declarada CRV-7: no es un sonido de consumo de ítem y no tiene equivalente digno).
+  El header del archivo documenta las dos fuentes. **[APLICADO 2026-07-24]**
+
+Verificación offline: compila (lupa) + harness client 55 OK. EN JUEGO (checklist del autor):
+comer/beber los 6 consumibles suena desde el banco de corpus (masticado/tragos/lata/vodka
+distintos entre sí); con corpus-stalker montado el vodka usa el banco de Corpus y NO el sonido
+original de la Zona (buscado a propósito — separación sonidos/ítems); el estómago sigue rugiendo
+con corpus-stalker. **Confirmado en juego por el autor el 2026-07-24.** Roadmap: entra el
+pendiente [8] (props comestibles de HL2 como base). Commiteado y pusheado con autorización del
+autor.

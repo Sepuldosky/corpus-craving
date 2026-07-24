@@ -5,9 +5,10 @@
 > secciones ni historial). El historial vive en `git` + [`CHANGELOG.md`](CHANGELOG.md).
 > Si crece de una pantalla, está mal redactado: recortar.
 
-**Última actualización:** 2026-07-14 (**Block 4 CERRADO**: v1 verificado en juego en
-tres rondas; los 12 entries del CHANGELOG en `[APLICADO]`. El v1 está **commiteado y
-pusheado a `origin/main`**)
+**Última actualización:** 2026-07-24 (**sonidos de consumo recableados al banco general
+de corpus** — `sound/corpus/craving/`, decisión de separación sonidos/ítems; **confirmado en
+juego, `[APLICADO]`, commiteado y pusheado**. Antes: **Block 4 CERRADO** el 2026-07-14 — v1
+verificado en juego en tres rondas; los 12 entries de su arco en `[APLICADO]`, commiteado y pusheado)
 
 ---
 
@@ -23,16 +24,21 @@ pusheado a `origin/main`**)
 - **Diseño**: decisiones A-F en [`Craving_Block4_Semilla.md`](Craving_Block4_Semilla.md),
   arquitectura ratificada en [`Craving_Architecture.md`](Craving_Architecture.md)
   (§7 enmendado por el gate WALK+USE).
-- **Assets**: el addon de contenido **Corpus S.T.A.L.K.E.R.** (ahora séptima raíz
-  del workspace, [`../../corpus-stalker/`](../../corpus-stalker/)) es autocontenido
-  para Craving — modelos + los 4 sonidos de consumo/hambre; fallback HL2/CS:S por
-  lista de candidatos, verificado. Las rutas de juego no cambiaron con la mudanza.
+- **Assets — dos fuentes, ninguna asumida** (2026-07-24): los sonidos de consumo
+  GENERALES vienen del banco del framework (`corpus/sound/corpus/craving/`, COR-17);
+  el addon de contenido [`../../corpus-stalker/`](../../corpus-stalker/) aporta los
+  modelos y el estómago (`hunger.mp3`, excepción CRV-7) — sus `zona/stalkerrp/*` de
+  comer/beber quedaron RESERVADOS a la comida propia de la Zona. Fallback HL2/CS:S
+  por lista de candidatos, sin cambios en el mecanismo.
 - **Harness offline**: verde en ambos realms (server 69 / client 55 + los checks
   del gate) — `python dev/harness_craving.py`.
 
 ## Pendiente de verificar
 
-- Nada bloqueante. **Pata sin-Cargo** (checklist §7, diferida a pedido del autor):
+- **Sonidos del banco general** (sesión 2026-07-24): **confirmado en juego** — los 6
+  consumibles suenan desde `corpus/craving/*` (masticado/tragos/lata/vodka distintos); el
+  vodka usa el banco de Corpus, no el original de la Zona (buscado). `[APLICADO]`.
+- Nada más bloqueante. **Pata sin-Cargo** (checklist §7, diferida a pedido del autor):
   logs de degradación + consumo in situ de la entity con WALK+E. La cubre el
   harness offline; se cierra en juego cuando el autor quiera.
 
