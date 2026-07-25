@@ -83,8 +83,13 @@ pero cuando difieran gana este doc. La §3 es por-repo, nunca se hereda del fram
     (corpus_craving_config.lua).
 
   assets:
-    Resolución de modelos/sonidos por candidatos y los sets del addon
-    Corpus S.T.A.L.K.E.R. (corpus_craving_assets.lua).
+    Dos cosas, ambas "lo que el módulo muestra", ninguna lógica de dominio:
+    (a) Resolución de modelos/sonidos por candidatos y los sets del addon
+        Corpus S.T.A.L.K.E.R. (corpus_craving_assets.lua).
+    (b) Identidad visual: los SVG de marca en assets/ (glifo pelado y lockup, en
+        variante light y dark) y el header del README que los embebe. Fuente de
+        verdad del diseño: corpus/docs/Corpus_Identidad.md.
+    Si un commit toca las dos, se parte en dos commits — no comparten motivo.
 
   core:
     Estado por jugador, tick de decay, umbrales, daño del fallback, persistencia
