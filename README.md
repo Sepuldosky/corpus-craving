@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/craving_lockup_dark.svg">
+    <img src="assets/craving_lockup_light.svg" width="200" alt="Craving">
+  </picture>
+</p>
+
 # Craving
 
 Módulo de **supervivencia de jugador** del ecosistema
