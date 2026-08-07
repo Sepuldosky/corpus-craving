@@ -66,7 +66,11 @@ if SERVER then
 
         local model = "models/props_junk/cardboard_box004a.mdl"
         if craving ~= nil and item ~= nil then
-            model = craving.Assets.Model(item.models)
+            -- Food.ModelOf y no Assets.Model: la regla "ruta propia si la
+            -- declara, si no la cadena de candidatos" vive en un solo lugar.
+            -- Resuelta acá aparte, una comida con `model` propio caería a la
+            -- cajita de cartón sin que nada fallara.
+            model = craving.Food.ModelOf(item)
             self:SetNWString("craving_label", item.name)
         end
 

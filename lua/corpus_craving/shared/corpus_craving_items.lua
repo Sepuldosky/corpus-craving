@@ -38,8 +38,12 @@ Corpus.OnReady(function()
             name     = item.name,
             weight   = item.weight,
             class    = "stackable",
+            -- categoría única `food`: la fila de tabs de Cargo está cerrada y una
+            -- categoría no mapeada caería en "Misc" (ver el header de food.lua).
+            -- La sub-clasificación viaja en kind/tier/tags, que Cargo transporta
+            -- sin interpretar (cita CRG-1).
             category = "food",
-            model    = CRAVING.Assets.Model(item.models),
+            model    = CRAVING.Food.ModelOf(item),
             trivia   = item.trivia,
             onUse    = function(ply)
                 -- semántica del consumo: dominio de Craving, no de Cargo.
