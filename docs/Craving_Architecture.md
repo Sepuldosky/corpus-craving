@@ -122,6 +122,12 @@ Reglas del puente (server, `corpus_craving_coagulant.lua`):
 
 ## 5. Consumibles v1 — el set contra Cargo
 
+> **ENMIENDA 2026-08-06 — registro abierto y taxonomía.** El set pasó de 6 a **15**
+> defs y dejó de ser una tabla literal. Lo de abajo sigue describiendo las seis
+> originales y el contrato contra Cargo, que **no cambió**; lo nuevo está en
+> **§5.1**. Ratificada por el autor el 2026-08-06 (los tres ejes se votaron
+> antes de bajar una línea de código).
+
 Seis defs stackeables, registradas en `Corpus.OnReady` con lazy-check de Cargo
 (sin Cargo se loguea y se apagan — la vía de mundo §7 no las necesita para
 existir, comparte la tabla de valores). El registro corre en **ambos realms**
@@ -156,6 +162,88 @@ contra el schema real de Cargo (`corpus_cargo_items.lua`, verificado):
 - Rutas ZONA verbatim del pack (inventario: `../../dev/zona_stalkerrp_contenido.md`
   §2.2); los `.mdl` referencian materiales por ruta compilada — **no
   re-namespacear**.
+
+---
+
+## 5.1 Registro abierto y taxonomía de comida (enmienda 2026-08-06)
+
+**CRV-13 — `CRAVING.Food.Register` es la única vía de alta de una comida.**
+Sede: `shared/corpus_craving_food.lua`, primero en el manifest.
+
+*Por qué.* Hasta acá, agregar una comida era editar la tabla literal
+`Config.ITEMS`, y el índice `Config.ITEMS_BY_ID` se construía **una sola vez** en
+file-scope al final de `config.lua`. Eso dejaba un defecto latente: un
+`table.insert` posterior (un addon de contenido, un lua refresh parcial) entraba
+en la lista pero **no** en el índice — y como `CRAVING.Consume(ply, id)` y la
+entity de mundo resuelven **por el índice**, la comida aparecía en el grid y era
+inconsumible. Nunca se pisó porque nunca nadie insertó fuera de file-scope, que
+es exactamente lo que un registro abierto vuelve normal. `Register` escribe las
+dos tablas juntas y no hay forma de tocar una sola.
+
+Las 6 originales **también** pasan por `Register`: una sola ruta, no dos.
+
+**Los campos de la taxonomía:**
+
+| campo | valores | qué gobierna HOY |
+|---|---|---|
+| `kind` | `food` \| `drink` (**cerrado**, obligatorio) | el stat del anti-desperdicio (CRV-8) |
+| `tier` | `junk` \| `standard` \| `quality` (**cerrado**, default `standard`) | **nada** — gancho de precio/rareza |
+| `tags` | set **abierto** (`packaged`, `alcohol`, `raw`, `cooked`, …) | **nada** — gancho de §14 |
+
+**CRV-14 — La sub-clasificación NO baja a `category` de Cargo.** Sería natural
+registrar `drinks` como categoría aparte, pero la fila de tabs de Cargo está
+**cerrada** (decisión del autor 2026-07-13): el set de categorías sigue abierto,
+pero el display mapea categoría→tab y **una categoría no mapeada cae en la tab
+"Misc"** — registrar `drinks` sacaría las bebidas de la tab Food. Por eso la
+categoría de Cargo sigue siendo **una sola** (`food`) y `kind`/`tier`/`tags`
+viajan como campos extra, que Cargo transporta sin interpretar (cita **CRG-1**).
+
+**El `kind` reemplaza una inferencia, y ése es el punto.** El anti-desperdicio
+elegía el stat "que el ítem más restaura", lo que hacía que una comida de
++20/+20 cayera del lado del hambre por el desempate del `>=` y no por ser comida.
+`Food.StatOf` es el único que traduce kind→stat.
+
+**COA-28 sigue mandando: `tier` y `tags` no implementan nada.** Existen para que
+los bloques diferidos de §14 tengan dónde engancharse (`raw`/`cooked` para
+cocinar, `alcohol`/`caffeine` para efectos) y para que el vocabulario no derive
+en sinónimos. Que el tag exista no abre el bloque.
+
+**CRV-15 — `Food.ModelOf` es la única regla de modelo.** Ruta propia si el ítem
+declara `model`; la cadena de candidatos de §6 si declara `models`. La regla vive
+en un solo lugar porque son **tres** los consumidores (las defs de Cargo, la
+entity de mundo y el selftest): escrita tres veces, alcanza con que una se olvide
+de `model` para que ese ítem salga como la cajita de cartón **sin que nada falle**.
+
+### El set de comida envasada — 9 defs con modelo propio
+
+Modelos **de este repo** (`models/corpus_craving/`), portados de *Props
+Mexicanos* (Workshop 3178402491, autor **gbonn**, que autoriza el uso con
+crédito). Atribución obligatoria en [`CREDITOS.md`](CREDITOS.md); pipeline
+reproducible en `dev/phastools/mxfood_build.py`.
+
+Declaran `model` directo y no cadena de candidatos, por el mismo argumento que
+Coagulant fijó el 2026-08-05: un modelo propio **no** le saca a un addon de
+contenido la posibilidad de re-vestirlos, porque `Cargo.Items.SetModel` pisa el
+declarado y se re-aplica en cada registro. Lo que cambia es solo qué se ve
+cuando **nadie** sustituye.
+
+| id (sin prefijo) | name (EN) | kind | +hunger | +hydration | kg | tier | tags |
+|---|---|---|---|---|---|---|---|
+| `sliced_bread` | Sliced bread | food | +55 | 0 | 0.68 | standard | packaged, bread |
+| `sweet_bun` | Sweet bun | food | +20 | 0 | 0.07 | standard | fresh, bread |
+| `instant_noodles` | Instant noodles | food | +25 | +5 | 0.07 | junk | packaged, noodles |
+| `milk_carton` | Milk carton | drink | +15 | +45 | 1.03 | standard | packaged, dairy |
+| `cola_bottle` | Cola bottle | drink | +10 | +50 | 2.60 | junk | packaged, soda, sugary, caffeine |
+| `cola_glass` | Glass cola bottle | drink | +5 | +25 | 0.60 | junk | bottled, soda, sugary, caffeine |
+| `beer_can` | Canned beer | drink | 0 | +10 | 0.37 | junk | alcohol, canned |
+| `beer_bottle` | Beer bottle | drink | 0 | +10 | 0.60 | standard | alcohol, bottled |
+| `beer_bottle_big` | Large beer bottle | drink | 0 | +15 | 1.20 | junk | alcohol, bottled |
+
+- **Nombres genéricos, marca en la trivia** (decisión del autor): Craving es
+  genérico, y que la bolsa diga una marca es color y no taxonomía.
+- **El alcohol entra sin efectos**, igual que el vodka: §14.2 sigue siendo bloque
+  futuro y el tag `alcohol` es el gancho. Son 4 los que lo llevan.
+- Los pesos son la masa real del producto y coinciden con el `$mass` del `.qc`.
 
 ---
 

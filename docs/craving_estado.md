@@ -5,10 +5,11 @@
 > secciones ni historial). El historial vive en `git` + [`CHANGELOG.md`](CHANGELOG.md).
 > Si crece de una pantalla, está mal redactado: recortar.
 
-**Última actualización:** 2026-07-24 (**sonidos de consumo recableados al banco general
-de corpus** — `sound/corpus/craving/`, decisión de separación sonidos/ítems; **confirmado en
-juego, `[APLICADO]`, commiteado y pusheado**. Antes: **Block 4 CERRADO** el 2026-07-14 — v1
-verificado en juego en tres rondas; los 12 entries de su arco en `[APLICADO]`, commiteado y pusheado)
+**Última actualización:** 2026-08-06 (**comida envasada: registro abierto, taxonomía y 9
+modelos propios** — Craving pasa de 6 a 15 consumibles; harness verde 254/240, escala 0,00 %
+y los 9 mirados en render, pero **NADA verificado en juego**: los 6 entries están
+`[PENDIENTE]` y sin commitear. Antes: sonidos al banco general el 2026-07-24 y **Block 4
+CERRADO** el 2026-07-14, todo `[APLICADO]` y pusheado)
 
 ---
 
@@ -33,8 +34,28 @@ verificado en juego en tres rondas; los 12 entries de su arco en `[APLICADO]`, c
 - **Harness offline**: verde en ambos realms (server 69 / client 55 + los checks
   del gate) — `python dev/harness_craving.py`.
 
+- **Comida: registro abierto + taxonomía + set envasado** (2026-08-06, §5.1 de la
+  arquitectura). `CRAVING.Food.Register` es la única vía de alta y mantiene
+  `ITEMS`/`ITEMS_BY_ID` juntas; `kind` (cerrado) manda el anti-desperdicio, `tier`
+  y `tags` son gancho de §14 y **no gobiernan nada** todavía. **9 modelos propios**
+  en `models/corpus_craving/` portados de *Props Mexicanos* (autor gbonn, permiso
+  con crédito → [`CREDITOS.md`](CREDITOS.md)), recompilados a escala real. Total:
+  **15 consumibles**.
+
 ## Pendiente de verificar
 
+- **EN JUEGO, la comida envasada** (sesión 2026-08-06, lo único bloqueante):
+  los 9 en el grid **con su modelo** (no la cajita), comer/beber con sus sonidos,
+  la entity de mundo con modelo propio, y el anti-desperdicio eligiendo el stat por
+  `kind`. Offline: harness 254/240 y **9/9 en las tres columnas del `check`**
+  (escala, flags del header, UV).
+- **RE-VERIFICAR los 5 parches de asset** (7 a 11 del CHANGELOG), salidos de **tres**
+  pasadas del autor: normal map sin píxeles negros, `$mostlyopaque` en las dos
+  botellas de cola, **UV volteadas**, **winding invertido** (se veía el interior del
+  modelo) y **los 9 girados un cuarto de vuelta**. Offline están las cinco columnas
+  del `check` en 9/9 — escala, flags, UV, winding y orientación, todas **contra el
+  `.mdl` original** — y el render comparativo original-vs-portado sale
+  indistinguible; pero el juez de un asset sigue siendo el juego.
 - **Sonidos del banco general** (sesión 2026-07-24): **confirmado en juego** — los 6
   consumibles suenan desde `corpus/craving/*` (masticado/tragos/lata/vodka distintos); el
   vodka usa el banco de Corpus, no el original de la Zona (buscado). `[APLICADO]`.

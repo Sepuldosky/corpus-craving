@@ -432,3 +432,181 @@ original de la Zona (buscado a propósito — separación sonidos/ítems); el es
 con corpus-stalker. **Confirmado en juego por el autor el 2026-07-24.** Roadmap: entra el
 pendiente [8] (props comestibles de HL2 como base). Commiteado y pusheado con autorización del
 autor.
+
+---
+
+## Sesión Comida envasada: registro abierto, taxonomía y 9 modelos propios — 2026-08-06
+
+Pedido del autor: sumar a Craving los objetos comestibles de *Props Mexicanos*
+(Workshop 3178402491, autor **gbonn**, que autoriza el uso con crédito), del mismo
+modo en que Coagulant estrenó modelos propios el 2026-08-05. Al abrirlo apareció
+que **"agregar una comida" no existía como operación**: era editar una tabla
+literal, y el índice se armaba una sola vez en file-scope. El autor pidió idear
+primero el sistema y votó los tres ejes antes de bajar código (§5.1 de la
+arquitectura). **Nada verificado en juego todavía.**
+
+- PARCHE 1 — feat(config): **registro abierto de comidas** (`corpus_craving_food.lua`,
+  nuevo, primero en el manifest). `Food.Register` es el ÚNICO escritor de
+  `Config.ITEMS` e `ITEMS_BY_ID` y las mantiene juntas por construcción — antes un
+  `table.insert` fuera de file-scope entraba en la lista y no en el índice, y como
+  `Consume(ply, id)` y la entity resuelven POR el índice, esa comida habría sido
+  visible e inconsumible. Las 6 originales migran al mismo registro: una ruta, no
+  dos. Superficie: `Register`/`Get`/`All`/`HasTag`/`ByTag`/`StatOf`/`ModelOf`.
+  **[PENDIENTE]**
+
+- PARCHE 2 — feat(config): **taxonomía `kind` / `tier` / `tags`** (CRV-13/CRV-14).
+  `kind` (cerrado, obligatorio) reemplaza la inferencia del anti-desperdicio, que
+  elegía "el stat que más restaura" — una comida de +20/+20 caía del lado del
+  hambre por el desempate del `>=` y no por ser comida. `tier` y `tags` **no
+  gobiernan nada** (cita COA-28): son el gancho declarado de §14 (`raw`/`cooked`
+  para cocinar, `alcohol`/`caffeine` para efectos). **No** bajan a `category` de
+  Cargo porque su fila de tabs está cerrada y una categoría no mapeada cae en
+  "Misc": la categoría sigue siendo `food` y los campos viajan en la def, que
+  Cargo transporta sin interpretar (CRG-1). **[PENDIENTE]**
+
+- PARCHE 3 — feat(assets): **9 modelos propios** en `models/corpus_craving/` +
+  `materials/models/corpus_craving/`, portados y **recompilados** desde el addon
+  de gbonn. Recompilados y no copiados por dos razones medidas: estaban a **2-3×
+  del tamaño real** (el pan medía 37 u ≈ 94 cm, contra el medkit de 12 u que
+  Coagulant ya había descartado por "prop de escenario"), y su `$cdmaterials`
+  venía horneado como `models/gbonn/`, lo que habría obligado a shipear
+  materiales en la carpeta de otro addon. Pipeline reproducible:
+  `dev/phastools/mxfood_build.py` (+ `srcprop2smd.py` y `mdlshot.py`, nuevos).
+  Créditos en `docs/CREDITOS.md`, nuevo. **[PENDIENTE]**
+
+- PARCHE 4 — feat(items): **9 defs de comida envasada** (`corpus_craving_food_mx.lua`,
+  nuevo): 3 comidas, 3 bebidas y 3 alcohólicas. Declaran `model` directo — el
+  mismo argumento de Coagulant: `Cargo.Items.SetModel` sigue pisando el modelo
+  declarado, así que un addon de contenido los re-viste igual. Nombres genéricos
+  y marca en la trivia (decisión del autor): Craving es un módulo genérico. El
+  alcohol entra **sin efectos**, como el vodka. Craving pasa de 6 a 15
+  consumibles. **[PENDIENTE]**
+
+- PARCHE 5 — refactor(items/entity): **`Food.ModelOf` es la única regla de modelo**
+  (CRV-15). `items.lua` y la entity de mundo la consumen en vez de llamar a
+  `Assets.Model(item.models)` cada uno por su lado: con la regla escrita en tres
+  lugares, alcanzaba con que uno se olvidara de `model` para que ese ítem saliera
+  como la cajita de cartón sin que nada fallara. **[PENDIENTE]**
+
+- PARCHE 6 — test(dev): **selftest de la taxonomía y del registro**. Por ítem:
+  kind/tier válidos, `tagset` coherente con `tags`, `StatOf` = el stat del kind, y
+  que exista `model` o `models`. Más el round-trip de `Register` (alta indexada,
+  re-registro que reemplaza en sitio sin duplicar, probe deshecho) y `ByTag`.
+  Y un check que faltaba: **que el `.mdl` propio declarado esté en disco** — un
+  modelo propio no tiene fallback, así que su ausencia no degrada, da el error de
+  modelo del engine. Es el mismo hueco que en Coagulant dejó pasar 35 referencias
+  rotas con el lote en verde. **[PENDIENTE]**
+
+Verificación offline: **harness verde en ambos realms, 254 OK server / 240 client**
+(`python dev/harness_craving.py`) — el harness ahora monta en su filesystem
+simulado las rutas que existen DE VERDAD en el repo, así el check de disco mide en
+vez de pasar siempre. **Control negativo corrido**: sacando `beer_can.mdl` el
+harness se pone rojo y nombra el archivo; restaurado, vuelve a verde. Escala de los
+9 modelos: **0,00 % de error contra el tamaño pedido** medido sobre la malla del
+`.mdl` compilado. Los 9 **renderizados y mirados** uno por uno: cada uno es el
+objeto correcto con su textura correcta — la verificación estructural no ve un
+modelo equivocado adentro de un `.mdl` que compila limpio.
+
+Pendiente: **verificación en juego** (los 9 en el grid con su modelo, comer y beber,
+la entity de mundo, el anti-desperdicio por `kind`).
+
+### Parches de la 1.ª pasada en juego — 2026-08-06
+
+El autor spawneó los 9 y reportó que **la iluminación se veía rara**. Dos defectos
+reales, los dos **míos y los dos invisibles para todo lo que se había verificado**:
+el `.mdl` compilaba limpio, la escala daba 0,00 %, el harness estaba verde y los
+renders se veían bien. Antes de acusar al shader se midió lo que yo había tocado.
+
+- PARCHE 7 — fix(assets): **el resize de texturas premultiplicaba por alfa**.
+  `Image.resize` de PIL sobre una imagen **RGBA** arrastra el color a NEGRO donde
+  el alfa es bajo. En el normal map de la Corona (4096², alfa medio 136 con mínimo
+  0) metió **120.340 píxeles negros** que el original no tenía — y negro en un
+  normal map no es una normal, es basura: la botella se ilumina mal justo ahí.
+  Medido: el original tiene **0** píxeles casi-negros; en RGBA los meten BOX,
+  BILINEAR, BICUBIC y LANCZOS **por igual** (~120 k cada uno) y sólo `NEAREST` se
+  salva porque no interpola; redimensionando en modo RGB, **cero con todos**.
+  Arreglado escalando RGB y alfa por separado: el bump pasó de −18,66 de media y
+  gamma implícita 1,283 a **−0,31 y 1,004**, con 0 negros. **[PENDIENTE]**
+
+- PARCHE 8 — fix(assets): **las dos botellas de cola perdían `TRANSLUCENT_TWOPASS`**.
+  El `.mdl` original trae el flag (`0x09`), el recompilado salía `0x01`: falta
+  `$mostlyopaque` en el `.qc`, que es lo que hace que un modelo con partes
+  translúcidas se dibuje en **dos pasadas** (lo opaco primero) para que se ordene
+  bien. Una botella transparente con líquido oscuro se ve mal sin eso. Ahora el
+  flag **se lee del `.mdl` fuente** en vez de decidirse a ojo, y `check` compara
+  los flags del header contra el original: **9/9**. Ese check no existía, y por eso
+  el defecto pasó — un flag ausente no rompe nada medible fuera del juego.
+  **[PENDIENTE]**
+
+Ojo con la evidencia: **los renders NO confirman estos dos parches.** `mdlshot.py`
+no interpreta el `.vmt` ni las pasadas del motor, así que las hojas de contacto se
+ven idénticas antes y después. Lo que se midió es el archivo (píxeles negros = 0,
+flags = los del original); lo que falta es el juego.
+
+### Parche de la 2.ª pasada en juego — 2026-08-06
+
+El autor reportó **texturas corridas** y objetos que **deberían ser más opacos**.
+Una sola causa, y la peor de las tres: la **V de las UV salía volteada en los 9**.
+
+- PARCHE 9 — fix(assets): **`srcprop2smd.py` escribía la V sin invertir**. El `.vvd`
+  guarda las UV como las usa el motor (v=0 **arriba**) y el SMD las lleva al revés,
+  así que studiomdl **voltea la V al compilar**: pasarla tal cual deja la textura
+  espejada verticalmente. Eso explica lo corrido — y probablemente también lo
+  translúcido, porque con la V volteada las UV de la Corona y de la Coca amarilla
+  (las dos con **`$alphatest`**) caían en zonas de alfa 0 y el shader **recortaba
+  la geometría**: un agujero se ve exactamente como "no es opaco". **[PENDIENTE]**
+
+**Por qué no lo agarró nada, que es lo que hay que aprender.** `mdlshot.py`
+muestreaba con `1-v`, o sea invertía de vuelta: **el instrumento de control
+compensaba exactamente el defecto que tenía que encontrar**, y las nueve hojas de
+contacto salieron perfectas y lo "confirmaron". Un instrumento que comparte el bug
+del proceso que audita no es que falle en detectarlo: lo *acredita*. Lo destapó el
+juego, y lo probó renderizar el **`.mdl` original** — la referencia que no comparte
+el bug: con `1-v` sale espejado y con `v` sale bien.
+
+Se agregó `check_uv()` al pipeline, comparando contra el `.mdl` fuente: **9/9 con
+las UV del original, 0,00000 de diferencia**. Ese check también tuvo que corregirse
+primero — comparaba índice a índice y daba 0/9 en U **y** en V, porque **studiomdl
+reordena los vértices**; se compara el conjunto ordenado, que es invariante a la
+permutación. **Control negativo corrido:** revirtiendo el flip, el check da 0/9 con
+dif V de 0,08 a 0,62 y U en 0,00000 — la firma exacta del defecto.
+
+### Parches de la 3.ª pasada en juego — 2026-08-06
+
+El autor reportó que veía **el interior de los objetos**, con la textura de afuera
+puesta adentro, y aportó el dato que resolvió el caso: *"el único que se salva es
+el pan Bimbo"*. Dos defectos más, los dos de orientación.
+
+- PARCHE 10 — fix(assets): **el winding de las caras salía invertido en los 9**.
+  El `.vtx` guarda las caras con la convención de Source y el SMD usa la
+  contraria, así que emitirlas tal cual deja **todos** los triángulos al revés: el
+  motor los descarta por backface culling y se ve el interior del modelo — la
+  etiqueta de la botella leyéndose espejada desde adentro. Medido contra el
+  original: **1812/1812, 2772/2772, 5680/5680 caras con el signo opuesto**, el
+  100 % en los 9. Que el pan Bimbo se salvara fue la pista: es el **único** cuyo
+  `.vmt` trae `$nocull 1`, o sea el único que dibuja las dos caras. **[PENDIENTE]**
+
+- PARCHE 11 — fix(assets): **los 9 estaban girados un cuarto de vuelta**. El
+  `--yaw -90` que compensaba la supuesta rotación de studiomdl era de más: la
+  malla no hay que rotarla. **El error no fue no medir, fue medir el archivo
+  equivocado** — la calibración comparó el **hull de colisión** del header (offset
+  104), que sale del `$collisionmodel` y no comparte la orientación de la malla.
+  Comparando hulls, `-90` "reproducía" el original con signo y todo. La malla del
+  `.vvd` dice lo contrario: `milk_carton` original **(5,99 × 4,04)** contra portado
+  **(4,04 × 5,99)**, y alineando vértice a vértice, 0° → 1,377 u mientras +90° →
+  **0,00047 u**. Es la misma trampa que ya había mordido en la escala (el primer
+  check medía el hull y daba +3,7 a +11 % de sesgo) y que no se arrastró hasta acá.
+  **[PENDIENTE]**
+
+**Por qué se acumularon tres rondas de esto.** `mdlshot.py` **no hacía backface
+culling**: dibujaba las caras traseras, así que un modelo con el winding invertido
+le salía perfecto. Ya había pasado lo mismo con la V (muestreaba `1-v` y
+compensaba el volteo). Dos veces el mismo patrón: **un instrumento que no modela
+el mecanismo del defecto no lo detecta y encima lo acredita.** Ahora el renderer
+culla, con el signo calibrado contra el `.mdl` original.
+
+El `check` pasó de una columna a **cinco**, todas contra el archivo original y no
+contra lo que yo pedí: escala, flags del header, UV, **winding** y **orientación**
+— **9/9 en las cinco**. Y el render dejó de ser una hoja suelta: ahora se compara
+**original contra portado con la misma cámara**, que es lo que vuelve visible una
+rotación (una hoja sola se ve perfectamente bien girada 90°).
