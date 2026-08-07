@@ -109,9 +109,13 @@ function CRAVING.Consume(ply, idOrItem)
     local item = istable(idOrItem) and idOrItem or Config.ITEMS_BY_ID[idOrItem]
     if item == nil then return false end
 
-    -- anti-desperdicio (§5): manda el stat que el ítem más restaura
+    -- anti-desperdicio (§5): manda el stat que declara el `kind` del ítem.
+    -- Antes se infería comparando los números ("gana el que más restaura"), que
+    -- es una heurística: una comida de +20/+20 caía del lado del hambre por el
+    -- desempate del >=, no por ser comida. El kind lo dice explícito (§5,
+    -- enmienda 2026-08-06) y Food.StatOf es el único que lo traduce.
     local st = GetState(ply)
-    local statRelevante = (item.hunger >= item.hydration) and "hunger" or "hydration"
+    local statRelevante = CRAVING.Food.StatOf(item)
     if st[statRelevante] >= Config.FULL_AT then
         Hint(ply, statRelevante == "hunger" and "You are not hungry." or "You are not thirsty.")
         return false

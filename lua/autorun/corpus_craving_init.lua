@@ -33,10 +33,11 @@
 -- adelante en file-scope — los cruces van en hooks con guardas.
 -- ============================================================
 local SHARED = {
-    "shared/corpus_craving_config.lua", -- convars + tablas de balance + funcs puras + getters client
-    "shared/corpus_craving_assets.lua", -- resolución de modelo/sonido por candidatos (§6)
-    "shared/corpus_craving_items.lua",  -- consumibles contra Cargo (soft-dep, §5) — AMBOS realms: el grid del cliente renderiza defs locales, el snapshot solo trae autogen
-    "shared/corpus_craving_dev.lua",    -- craving_selftest + comandos de verificación
+    "shared/corpus_craving_food.lua",    -- registro de comidas + taxonomía (§5) — PRIMERO: config.lua da de alta las suyas llamándolo
+    "shared/corpus_craving_config.lua",  -- convars + tablas de balance + funcs puras + getters client + las 6 comidas base
+    "shared/corpus_craving_assets.lua",  -- resolución de modelo/sonido por candidatos (§6)
+    "shared/corpus_craving_items.lua",   -- consumibles contra Cargo (soft-dep, §5) — AMBOS realms: el grid del cliente renderiza defs locales, el snapshot solo trae autogen
+    "shared/corpus_craving_dev.lua",     -- craving_selftest + comandos de verificación
 }
 local SERVER_FILES = {
     "server/corpus_craving_coagulant.lua", -- puente mock-first a Coagulant (§4) — antes que core: core lo consume en su tick

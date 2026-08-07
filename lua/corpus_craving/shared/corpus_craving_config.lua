@@ -74,72 +74,81 @@ Config.FULL_AT = 98
 -- Sonido: "eat" | "drink" | "can" | "vodka" (ver Assets.ConsumeSound). Strings
 -- de cara al jugador (name, trivia) en inglés — idioma del mod.
 -- ============================================================
-Config.ITEMS = {
-    {
-        id = "corpus_craving_bread", name = "Bread",
-        hunger = 30, hydration = 0, weight = 0.30, sound = "eat",
-        models = {
-            "models/stalker/item/food/bread.mdl",
-            "models/props/cs_italy/bread_slice.mdl",
-            "models/props_junk/garbage_takeoutcarton001a.mdl",
-        },
-        trivia = "Half a loaf. Stale, but it keeps you walking.",
-    },
-    {
-        id = "corpus_craving_sausage", name = "Sausage",
-        hunger = 50, hydration = 0, weight = 0.45, sound = "eat",
-        models = {
-            "models/stalker/item/food/sausage.mdl",
-            "models/props/cs_italy/it_mkt_sausage.mdl",
-            "models/props_junk/garbage_takeoutcarton001a.mdl",
-        },
-        trivia = "Smoked sausage. The best meal you will find out here.",
-    },
-    {
-        id = "corpus_craving_tuna", name = "Canned tuna",
-        hunger = 35, hydration = 5, weight = 0.25, sound = "eat",
-        models = {
-            "models/stalker/item/food/tuna.mdl",
-            "models/props_junk/garbage_metalcan001a.mdl",
-        },
-        trivia = "No opener needed. Do not ask how old it is.",
-    },
-    {
-        -- el drink.mdl ZONA es una bebida energética (ronda 2 en juego) — acá
-        -- va botella: plástica HL2 si el mapa la trae, vidrio garantizado
-        id = "corpus_craving_water", name = "Water bottle",
-        hunger = 0, hydration = 60, weight = 0.60, sound = "drink",
-        models = {
-            "models/props_junk/garbage_plasticbottle003a.mdl",
-            "models/props_junk/glassbottle01a.mdl",
-        },
-        trivia = "Clean drinking water. Worth more than it looks.",
-    },
-    {
-        id = "corpus_craving_softdrink", name = "Soft drink",
-        hunger = 5, hydration = 30, weight = 0.33, sound = "can",
-        models = {
-            "models/stalker/item/food/drink.mdl",
-            "models/props_junk/PopCan01a.mdl",
-        },
-        trivia = "Warm, flat and full of sugar.",
-    },
-    {
-        id = "corpus_craving_vodka", name = "Vodka",
-        hunger = 0, hydration = 5, weight = 0.50, sound = "vodka",
-        models = {
-            "models/stalker/item/food/vokda.mdl", -- (sic — el typo es del pack ZONA)
-            "models/props_junk/glassbottle01a.mdl",
-        },
-        trivia = "Barely counts as a drink. Effects? Some day.",
-    },
-}
+-- Alta por CRAVING.Food.Register (food.lua, cargado antes que este archivo):
+-- una sola ruta, que mantiene ITEMS e ITEMS_BY_ID juntos por construcción.
+-- `kind` es lo que decide el stat del anti-desperdicio; `tier` y `tags` no
+-- gobiernan nada todavía (cita COA-28) y son el gancho declarado del §14.
+local Food = CRAVING.Food
 
--- Índice por id (derivado, para lookups de onUse y de la entity)
-Config.ITEMS_BY_ID = {}
-for _, item in ipairs(Config.ITEMS) do
-    Config.ITEMS_BY_ID[item.id] = item
-end
+Food.Register({
+    id = "corpus_craving_bread", name = "Bread", kind = "food",
+    hunger = 30, hydration = 0, weight = 0.30, sound = "eat",
+    tier = "standard", tags = { "bread" },
+    models = {
+        "models/stalker/item/food/bread.mdl",
+        "models/props/cs_italy/bread_slice.mdl",
+        "models/props_junk/garbage_takeoutcarton001a.mdl",
+    },
+    trivia = "Half a loaf. Stale, but it keeps you walking.",
+})
+
+Food.Register({
+    id = "corpus_craving_sausage", name = "Sausage", kind = "food",
+    hunger = 50, hydration = 0, weight = 0.45, sound = "eat",
+    tier = "quality", tags = { "meat" },
+    models = {
+        "models/stalker/item/food/sausage.mdl",
+        "models/props/cs_italy/it_mkt_sausage.mdl",
+        "models/props_junk/garbage_takeoutcarton001a.mdl",
+    },
+    trivia = "Smoked sausage. The best meal you will find out here.",
+})
+
+Food.Register({
+    id = "corpus_craving_tuna", name = "Canned tuna", kind = "food",
+    hunger = 35, hydration = 5, weight = 0.25, sound = "eat",
+    tier = "standard", tags = { "canned", "meat" },
+    models = {
+        "models/stalker/item/food/tuna.mdl",
+        "models/props_junk/garbage_metalcan001a.mdl",
+    },
+    trivia = "No opener needed. Do not ask how old it is.",
+})
+
+Food.Register({
+    -- el drink.mdl ZONA es una bebida energética (ronda 2 en juego) — acá
+    -- va botella: plástica HL2 si el mapa la trae, vidrio garantizado
+    id = "corpus_craving_water", name = "Water bottle", kind = "drink",
+    hunger = 0, hydration = 60, weight = 0.60, sound = "drink",
+    tier = "standard", tags = { "bottled" },
+    models = {
+        "models/props_junk/garbage_plasticbottle003a.mdl",
+        "models/props_junk/glassbottle01a.mdl",
+    },
+    trivia = "Clean drinking water. Worth more than it looks.",
+})
+
+Food.Register({
+    id = "corpus_craving_softdrink", name = "Soft drink", kind = "drink",
+    hunger = 5, hydration = 30, weight = 0.33, sound = "can",
+    tier = "junk", tags = { "soda", "sugary", "caffeine" },
+    models = {
+        "models/stalker/item/food/drink.mdl",
+        "models/props_junk/PopCan01a.mdl",
+    },
+    trivia = "Warm, flat and full of sugar.",
+})
+
+Food.Register({
+    id = "corpus_craving_vodka", name = "Vodka", kind = "drink",
+    hunger = 0, hydration = 5, weight = 0.50, sound = "vodka",
+    tier = "junk", tags = { "alcohol", "bottled" },
+    models = {
+        "models/stalker/item/food/vokda.mdl", -- (sic — el typo es del pack ZONA)
+        "models/props_junk/glassbottle01a.mdl",
+    },
+    trivia = "Barely counts as a drink. Effects? Some day.",
+})
 
 -- ============================================================
 -- Funciones puras
