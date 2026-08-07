@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/corpus_craving/cocacola_amarilla"
+	"$bumpmap" "models/corpus_craving/main_cocacola_normal"
+	"$envmap" "env_cubemap"
+	"$alphatest" 1
+	"$envmaptint" "[.3 .3 .3]"
+}

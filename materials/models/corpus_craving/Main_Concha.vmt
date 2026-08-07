@@ -1,0 +1,11 @@
+"VertexLitGeneric"
+{
+	$basetexture               "models/corpus_craving/main_concha_basecolor"
+	$bumpmap                   "models/corpus_craving/main_concha_bump"
+
+	$envmap                    "env_cubemap"
+	$normalmapalphaenvmapmask  1
+
+	$envmaptint                0.05
+	$envmaplightscale          0.98
+}

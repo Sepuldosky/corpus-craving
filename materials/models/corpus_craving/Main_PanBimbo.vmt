@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/corpus_craving/main_panbimbo"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[.2 .2 .2]"
+	"$model" 1
+	"$nocull" 1
+}

@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	$basetexture               "models/corpus_craving/main_caguama_basecolor"
+	$bumpmap                   "models/corpus_craving/main_caguama_bump"
+
+	$envmap                    "env_cubemap"
+	$normalmapalphaenvmapmask  1
+
+	$envmaptint                0.3
+}

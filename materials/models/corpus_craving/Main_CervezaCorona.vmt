@@ -1,0 +1,16 @@
+"VertexLitGeneric"
+{
+	$basetexture               "models/corpus_craving/main_cervezacorona_basecolor"
+	$bumpmap                   "models/corpus_craving/main_cervezacorona_bump"
+	$alphatest	     1
+
+
+	$envmap                    "env_cubemap"
+	$normalmapalphaenvmapmask  1
+	$envmaptint .6
+
+	$phong 1
+	$phongexponent 5
+	$phongboost 100
+	$phongfresnelranges "[0 0.5 1]"
+}

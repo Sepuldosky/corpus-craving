@@ -55,16 +55,80 @@ function CRAVING._SelfTest()
     check(Config.DrainPerTick("noexiste", false, nil) == 0, "stat desconocido drena")
 
     -- Tabla de ítems (§5): integridad
-    check(#Config.ITEMS == 6, "ITEMS no tiene 6 consumibles")
+    local Food = CRAVING.Food
+    check(#Config.ITEMS == 15, "ITEMS no tiene 15 consumibles (6 base + 9 envasadas)")
+    check(Food.All() == Config.ITEMS, "Food.All no devuelve la lista viva by-ref")
+
+    local propios = 0
     for _, item in ipairs(Config.ITEMS) do
         check(Config.ITEMS_BY_ID[item.id] == item, "ITEMS_BY_ID no indexa " .. tostring(item.id))
+        check(Food.Get(item.id) == item, "Food.Get no devuelve el mismo ítem: " .. tostring(item.id))
         check(isstring(item.name) and item.name ~= "", "ítem sin name: " .. tostring(item.id))
         check(isnumber(item.weight) and item.weight > 0, "peso inválido: " .. tostring(item.id))
         check((item.hunger or 0) + (item.hydration or 0) > 0, "ítem que no restaura nada: " .. tostring(item.id))
-        check(istable(item.models) and #item.models >= 2, "ítem sin cadena de modelos: " .. tostring(item.id))
-        -- la resolución siempre devuelve una ruta (el último candidato es HL2 vanilla)
-        check(isstring(CRAVING.Assets.Model(item.models)), "Assets.Model no resuelve: " .. tostring(item.id))
+
+        -- taxonomía (§5, enmienda 2026-08-06)
+        check(Food.KINDS[item.kind] ~= nil, "kind inválido: " .. tostring(item.id))
+        check(Food.TIERS[item.tier] ~= nil, "tier inválido: " .. tostring(item.id))
+        check(istable(item.tags) and istable(item.tagset), "tags/tagset ausentes: " .. tostring(item.id))
+        for _, t in ipairs(item.tags) do
+            check(Food.HasTag(item, t), "tagset no refleja el tag '" .. tostring(t) .. "': " .. tostring(item.id))
+        end
+        -- el stat sale del kind, NO de comparar los números: un ítem mixto que
+        -- restaure más hambre que sed puede ser igual una bebida
+        check(Food.StatOf(item) == Food.KINDS[item.kind], "StatOf no coincide con el kind: " .. tostring(item.id))
+
+        -- modelo: ruta propia o cadena de candidatos, nunca ninguna de las dos
+        check(isstring(item.model) or (istable(item.models) and #item.models >= 2),
+            "ítem sin modelo propio ni cadena de candidatos: " .. tostring(item.id))
+        check(isstring(Food.ModelOf(item)) and Food.ModelOf(item) ~= "",
+            "Food.ModelOf no resuelve: " .. tostring(item.id))
+        if isstring(item.model) then
+            propios = propios + 1
+            -- Un modelo PROPIO no tiene fallback por diseño, así que su ausencia
+            -- no degrada: da el error de modelo del engine. Chequear que el
+            -- archivo esté es el único check que distingue "instalado" de
+            -- "declarado" — mismo hueco que en Coagulant dejó pasar 35
+            -- referencias rotas con el lote en verde.
+            check(file.Exists(item.model, "GAME"),
+                "el .mdl propio declarado NO está en disco: " .. item.model)
+        else
+            -- la resolución siempre devuelve una ruta (el último candidato es HL2 vanilla)
+            check(isstring(CRAVING.Assets.Model(item.models)), "Assets.Model no resuelve: " .. tostring(item.id))
+        end
     end
+    check(propios == 9, "se esperaban 9 ítems con modelo propio, hay " .. propios)
+
+    -- Filtro por tag: el alcohol es el gancho declarado del §14.2 y hoy son 4
+    -- (el vodka base + las tres cervezas envasadas)
+    check(#Food.ByTag("alcohol") == 4, "ByTag('alcohol') no devuelve 4")
+    check(#Food.ByTag("no_existe_este_tag") == 0, "ByTag inventa resultados con un tag desconocido")
+
+    -- Register es el ÚNICO escritor y mantiene las dos tablas juntas: un alta
+    -- nueva tiene que aparecer en la lista Y en el índice, y re-registrar el
+    -- mismo id reemplaza en sitio en vez de duplicar (lua refresh)
+    local n0 = #Config.ITEMS
+    local probe = Food.Register({
+        id = "corpus_craving__selftest_probe", name = "Probe", kind = "drink",
+        hunger = 0, hydration = 1, weight = 0.01, sound = "drink",
+        model = "models/props_junk/glassbottle01a.mdl",
+    })
+    check(#Config.ITEMS == n0 + 1, "Register no agregó a la lista")
+    check(Food.Get("corpus_craving__selftest_probe") == probe, "Register no indexó el alta")
+    Food.Register({
+        id = "corpus_craving__selftest_probe", name = "Probe 2", kind = "food",
+        hunger = 1, hydration = 0, weight = 0.01, sound = "eat",
+        model = "models/props_junk/glassbottle01a.mdl",
+    })
+    check(#Config.ITEMS == n0 + 1, "re-registrar el mismo id duplicó la entrada")
+    check(Food.Get("corpus_craving__selftest_probe").name == "Probe 2", "re-registrar no reemplazó la def")
+    -- deshacer: el probe no puede quedar vivo en el inventario de nadie
+    for i, v in ipairs(Config.ITEMS) do
+        if v.id == "corpus_craving__selftest_probe" then table.remove(Config.ITEMS, i) break end
+    end
+    Config.ITEMS_BY_ID["corpus_craving__selftest_probe"] = nil
+    check(#Config.ITEMS == n0 and Food.Get("corpus_craving__selftest_probe") == nil,
+        "el probe del selftest quedó registrado")
 
     -- Assets (§6): lista sin candidatos montados → devuelve el último
     check(CRAVING.Assets.Model({ "models/no/existe.mdl", "models/tampoco.mdl" }) == "models/tampoco.mdl",

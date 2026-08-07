@@ -36,6 +36,7 @@ local SHARED = {
     "shared/corpus_craving_food.lua",    -- registro de comidas + taxonomía (§5) — PRIMERO: config.lua da de alta las suyas llamándolo
     "shared/corpus_craving_config.lua",  -- convars + tablas de balance + funcs puras + getters client + las 6 comidas base
     "shared/corpus_craving_assets.lua",  -- resolución de modelo/sonido por candidatos (§6)
+    "shared/corpus_craving_food_mx.lua", -- set de comida envasada con modelos propios (§5) — después de assets: comparte el registro, no la resolución
     "shared/corpus_craving_items.lua",   -- consumibles contra Cargo (soft-dep, §5) — AMBOS realms: el grid del cliente renderiza defs locales, el snapshot solo trae autogen
     "shared/corpus_craving_dev.lua",     -- craving_selftest + comandos de verificación
 }
